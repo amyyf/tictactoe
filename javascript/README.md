@@ -1,6 +1,6 @@
 # Tic Tac Toe for Command Line Games
 
-Fork or clone the repository to your machine.
+Fork or clone the repository to your machine. This version of the project is in JavaScript, so `cd` into the `javascript` directory.
 
 ## To play the game
 
