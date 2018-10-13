@@ -1,0 +1,14 @@
+{
+  "name": "tictactoe",
+  "version": "1.0.0",
+  "description": "Refactoring a command line game",
+  "main": "game.js",
+  "scripts": {
+    "test": "jasmine spec/appSpec.js"
+  },
+  "author": "Amy Frieson",
+  "license": "ISC",
+  "dependencies": {
+    "jasmine": "^3.2.0"
+  }
+}

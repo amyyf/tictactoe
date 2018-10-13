@@ -217,3 +217,10 @@ const play = function () {
 };
 
 play();
+
+// export for Jasmine testing
+module.exports = {
+  board: board,
+  boardFilled: boardFilled,
+  show: show
+};
