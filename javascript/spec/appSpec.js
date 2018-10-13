@@ -2,8 +2,29 @@
 
 const game = require('../game');
 
-describe('the game board', function () {
+describe('The game board', function () {
   it('exists', function () {
     expect(game.board).toBeDefined();
+  });
+  it('renders in the console', function () {
+    const board = (/........./);
+    expect(game.show()).toMatch(board);
+  });
+});
+
+describe('During gameplay', function () {
+  it('valid user input makes a move', function () {
+    const X = game.players[0];
+    expect(game.move(2, X)).toBe(true);
+  });
+  // TODO test comp function
+});
+
+describe('To win', function () {
+  it('board not full at game start', function () {
+    expect(game.boardFilled()).toBeFalsy();
+  });
+  it('game has not been won at game start', function () {
+    expect(game.winner()).toBeFalsy();
   });
 });

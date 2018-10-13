@@ -80,7 +80,7 @@ const board = [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '];
 const X = 'X';
 const O = 'O';
 // TODO use the below var or delete it
-// const players = [X, O];
+const players = [X, O];
 let currTurn = X;
 
 // this fn controls computer gameplay, runs after player makes a move and gameplay should continue
@@ -221,6 +221,12 @@ play();
 // export for Jasmine testing
 module.exports = {
   board: board,
+  boardDisplay: boardDisplay,
   boardFilled: boardFilled,
-  show: show
+  comp: comp,
+  move: move,
+  play: play,
+  players: players,
+  show: show,
+  winner: winner
 };
