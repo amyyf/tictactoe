@@ -1,88 +1,108 @@
 const model = {
   // patterns to win as O (or block O), position to play
+  // 0 indicates an unchosen spot
   patterns1: [
-    [(/ OO....../), 0],
-    [(/O..O.. ../), 6],
-    [(/......OO /), 8],
-    [(/.. ..O..O/), 2],
-    [(/ ..O..O../), 0],
-    [(/...... OO/), 6],
-    [(/..O..O.. /), 8],
-    [(/OO ....../), 2],
-    [(/ ...O...O/), 0],
-    [(/..O.O. ../), 6],
-    [(/O...O... /), 8],
-    [(/.. .O.O../), 2],
-    [(/O O....../), 1],
-    [(/O.. ..O../), 3],
-    [(/......O O/), 7],
-    [(/..O.. ..O/), 5],
-    [(/. ..O..O./), 1],
-    [(/... OO.../), 3],
-    [(/.O..O.. ./), 7],
-    [(/...OO .../), 5]
+    [(/022....../), 0],
+    [(/2..2..0../), 6],
+    [(/......220/), 8],
+    [(/..0..2..2/), 2],
+    [(/0..2..2../), 0],
+    [(/......022/), 6],
+    [(/..2..2..0/), 8],
+    [(/220....../), 2],
+    [(/0...2...2/), 0],
+    [(/..2.2.0../), 6],
+    [(/2...2...0/), 8],
+    [(/..0.2.2../), 2],
+    [(/202....../), 1],
+    [(/2..0..2../), 3],
+    [(/......202/), 7],
+    [(/..2..0..2/), 5],
+    [(/.0..2..2./), 1],
+    [(/...022.../), 3],
+    [(/.2..2..0./), 7],
+    [(/...220.../), 5]
   ],
   // patterns to win as X (or block X), position to play
   patterns2: [
-    [(/ {2}X . X {2}/), 1],
-    [(/ XX....../), 0],
-    [(/X..X.. ../), 6],
-    [(/......XX /), 8],
-    [(/.. ..X..X/), 2],
-    [(/ ..X..X../), 0],
-    [(/...... XX/), 6],
-    [(/..X..X.. /), 8],
-    [(/XX ....../), 2],
-    [(/ ...X...X/), 0],
-    [(/..X.X. ../), 6],
-    [(/X...X... /), 8],
-    [(/.. .X.X../), 2],
-    [(/X X....../), 1],
-    [(/X.. ..X../), 3],
-    [(/......X X/), 7],
-    [(/..X.. ..X/), 5],
-    [(/. ..X..X./), 1],
-    [(/... XX.../), 3],
-    [(/.X..X.. ./), 7],
-    [(/...XX .../), 5],
-    [(/ X X.. ../), 0],
-    [(/ ..X.. X /), 6],
-    [(/.. ..X X /), 8],
-    [(/ X ..X.. /), 2],
-    [(/ {2}XX.. ../), 0],
-    [(/X.. .. X /), 6],
-    [(/.. .XX {3}/), 8],
-    [(/X {2}..X.. /), 2],
-    [(/ X {2}..X../), 0],
-    [(/ ..X.. {2}X/), 6],
-    [(/..X.. {2}X /), 8],
-    [(/X {2}..X.. /), 2]
+    [(/0{2}10.010{2}/), 1],
+    [(/011....../), 0],
+    [(/1..1..0../), 6],
+    [(/......110/), 8],
+    [(/..0..1..1/), 2],
+    [(/0..1..1../), 0],
+    [(/......011/), 6],
+    [(/..1..1..0/), 8],
+    [(/110....../), 2],
+    [(/0...1...1/), 0],
+    [(/..1.1.0../), 6],
+    [(/1...1...0/), 8],
+    [(/..0.1.1../), 2],
+    [(/101....../), 1],
+    [(/1..0..1../), 3],
+    [(/......101/), 7],
+    [(/..1..0..1/), 5],
+    [(/.0..1..1./), 1],
+    [(/...011.../), 3],
+    [(/.1..1..0./), 7],
+    [(/...110.../), 5],
+    [(/0101..0../), 0],
+    [(/0..1..010/), 6],
+    [(/..0..1010/), 8],
+    [(/010..1.. /), 2],
+    [(/0{2}11..0../), 0],
+    [(/1..0..010/), 6],
+    [(/..0.110{3}/), 8],
+    [(/10{2}..1..0/), 2],
+    [(/010{2}..1../), 0],
+    [(/0..1..0{2}1/), 6],
+    [(/..1..0{2}10/), 8],
+    [(/10{2}..1..0/), 2]
   ],
   // these are the possible winning strings for each player
   patterns3: [
-    [(/OOO....../), 'O'],
-    [(/...OOO.../), 'O'],
-    [(/......OOO/), 'O'],
-    [(/O..O..O../), 'O'],
-    [(/.O..O..O./), 'O'],
-    [(/..O..O..O/), 'O'],
-    [(/O...O...O/), 'O'],
-    [(/..O.O.O../), 'O'],
-    [(/XXX....../), 'X'],
-    [(/...XXX.../), 'X'],
-    [(/......XXX/), 'X'],
-    [(/X..X..X../), 'X'],
-    [(/.X..X..X./), 'X'],
-    [(/..X..X..X/), 'X'],
-    [(/X...X...X/), 'X'],
-    [(/..X.X.X../), 'X']
+    [(/222....../), '2'],
+    [(/...222.../), '2'],
+    [(/......222/), '2'],
+    [(/2..2..2../), '2'],
+    [(/.2..2..2./), '2'],
+    [(/..2..2..2/), '2'],
+    [(/2...2...2/), '2'],
+    [(/..2.2.2../), '2'],
+    [(/111....../), '1'],
+    [(/...111.../), '1'],
+    [(/......111/), '1'],
+    [(/1..1..1../), '1'],
+    [(/.1..1..1./), '1'],
+    [(/..1..1..1/), '1'],
+    [(/1...1...1/), '1'],
+    [(/..1.1.1../), '1']
   ],
-  board: [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+  board: [0, 0, 0, 0, 0, 0, 0, 0, 0],
   X: 'X',
   O: 'O',
-  // TODO use the below var or delete it
-  players: [this.X, this.O],
-  currTurn: this.X
+  // TODO generate players and symbols from user input
+  players: [
+    {
+      name: 'player1',
+      data: 1,
+      symbol: 'X'
+    },
+    {
+      name: 'player2',
+      data: 2,
+      symbol: 'O'
+    }
+  ],
+  currTurn: this.X,
+  shareBoardData: function () {
+    return this.board;
+  },
+  sharePlayerSymbols: function () {
+    const player1Symbol = this.players[0].symbol;
+    const player2Symbol = this.players[1].symbol;
+    return [player1Symbol, player2Symbol];
+  }
 };
 
 const controller = {
@@ -91,7 +111,9 @@ const controller = {
   },
 
   show: function () {
-    console.log(view.boardDisplay());
+    const boardData = model.shareBoardData();
+    const playerSymbols = model.sharePlayerSymbols();
+    console.log(view.boardDisplay(boardData, playerSymbols));
   },
 
   // this fn controls computer gameplay, runs after player makes a move and gameplay should continue
@@ -104,7 +126,8 @@ const controller = {
         x = this.getMove();
       }
     }
-    this.move(x, model.O);
+    // TODO 2 is hard-coded for the computer player's data
+    this.move(x, 2);
   },
 
   // executes after player gives valid input or computer fn has selected a space
@@ -114,7 +137,7 @@ const controller = {
     //   return false;
     // }
     // unary plus ('+') converts position to a number
-    if (+pos >= 0 && +pos <= 8 && !isNaN(+pos) && model.board[+pos] === ' ') {
+    if (+pos >= 0 && +pos <= 8 && !isNaN(+pos) && model.board[+pos] === 0) {
       model.board.splice(+pos, 1, x);
       model.currTurn = (x === model.X) ? model.O : model.X;
       return true;
@@ -185,10 +208,10 @@ const controller = {
   /* the computer's default/fallback position is the center or, if the center is filled,
   the first empty space IF there's no possible win on the next move */
   getMove: function () {
-    if (model.board[4] === ' ') {
+    if (model.board[4] === 0) {
       return 4;
     }
-    return model.board.indexOf(' ');
+    return model.board.indexOf(0);
   },
 
   exit: function () {
@@ -201,7 +224,8 @@ const controller = {
     console.log('Enter [0-8]:');
     process.openStdin().on('data', function (res) {
       // if move is valid, check if gameplay should end
-      if (boundController.move(res, model.X)) {
+      // TODO 1 is hard-coded for player 1's data
+      if (boundController.move(res, 1)) {
         if (boundController.winner() || boundController.boardFilled()) {
           boundController.exit();
         } else {
@@ -213,17 +237,31 @@ const controller = {
             boundController.show();
           }
         }
-      } // TODO need an 'else' to handle (move(res, X) === false) - meaning bad data entry
+        // TODO need an 'else' to handle (move(res, X) === false) - meaning bad data entry
+      } else {
+        console.log('moveFN not valid');
+      }
     });
   }
 };
 
 const view = {
   // TODO "the existing code is so coupled to the console"
-  boardDisplay: function () {
-    return ' ' + model.board[0] + ' |' + ' ' + model.board[1] + ' |' + ' ' + model.board[2] + '\n===+===+===\n' +
-    ' ' + model.board[3] + ' |' + ' ' + model.board[4] + ' |' + ' ' + model.board[5] + '\n===+===+===\n' +
-    ' ' + model.board[6] + ' |' + ' ' + model.board[7] + ' |' + ' ' + model.board[8];
+  boardDisplay: function (boardData, playerSymbols) {
+    console.log(boardData);
+    const [ player1Symbol, player2Symbol ] = playerSymbols;
+    const boardSymbols = boardData.map(space => {
+      if (space === 0) {
+        return ' ';
+      } else if (space === 1) {
+        return player1Symbol;
+      } else if (space === 2) {
+        return player2Symbol;
+      }
+    });
+    return ' ' + boardSymbols[0] + ' |' + ' ' + boardSymbols[1] + ' |' + ' ' + boardSymbols[2] + '\n===+===+===\n' +
+    ' ' + boardSymbols[3] + ' |' + ' ' + boardSymbols[4] + ' |' + ' ' + boardSymbols[5] + '\n===+===+===\n' +
+    ' ' + boardSymbols[6] + ' |' + ' ' + boardSymbols[7] + ' |' + ' ' + boardSymbols[8];
   }
 };
 
