@@ -113,7 +113,7 @@ const controller = {
   show: function () {
     const boardData = model.shareBoardData();
     const playerSymbols = model.sharePlayerSymbols();
-    console.log(view.boardDisplay(boardData, playerSymbols));
+    view.renderBoard(boardData, playerSymbols);
   },
 
   // this fn controls computer gameplay, runs after player makes a move and gameplay should continue
@@ -150,7 +150,7 @@ const controller = {
     let x = this.getMove();
     if (x === -1) {
       this.show();
-      console.log('Game over');
+      view.renderGameOver();
       return true;
     }
     return false;
@@ -175,7 +175,7 @@ const controller = {
     // TODO implement message or similar to congratulate winner
     if (theWinner) {
       this.show();
-      console.log('Game over');
+      view.renderGameOver();
       return true;
     }
     return false;
@@ -221,7 +221,7 @@ const controller = {
   play: function () {
     this.show();
     const boundController = this;
-    console.log('Enter [0-8]:');
+    view.renderInstructions();
     process.openStdin().on('data', function (res) {
       // if move is valid, check if gameplay should end
       // TODO 1 is hard-coded for player 1's data
@@ -239,7 +239,7 @@ const controller = {
         }
         // TODO need an 'else' to handle (move(res, X) === false) - meaning bad data entry
       } else {
-        console.log('moveFN not valid');
+        view.renderInvalidEntry();
       }
     });
   }
@@ -247,8 +247,7 @@ const controller = {
 
 const view = {
   // TODO "the existing code is so coupled to the console"
-  boardDisplay: function (boardData, playerSymbols) {
-    console.log(boardData);
+  renderBoard: function (boardData, playerSymbols) {
     const [ player1Symbol, player2Symbol ] = playerSymbols;
     const boardSymbols = boardData.map(space => {
       if (space === 0) {
@@ -259,9 +258,18 @@ const view = {
         return player2Symbol;
       }
     });
-    return ' ' + boardSymbols[0] + ' |' + ' ' + boardSymbols[1] + ' |' + ' ' + boardSymbols[2] + '\n===+===+===\n' +
+    console.log(' ' + boardSymbols[0] + ' |' + ' ' + boardSymbols[1] + ' |' + ' ' + boardSymbols[2] + '\n===+===+===\n' +
     ' ' + boardSymbols[3] + ' |' + ' ' + boardSymbols[4] + ' |' + ' ' + boardSymbols[5] + '\n===+===+===\n' +
-    ' ' + boardSymbols[6] + ' |' + ' ' + boardSymbols[7] + ' |' + ' ' + boardSymbols[8];
+    ' ' + boardSymbols[6] + ' |' + ' ' + boardSymbols[7] + ' |' + ' ' + boardSymbols[8]);
+  },
+  renderGameOver: function () {
+    console.log('Game over');
+  },
+  renderInstructions: function () {
+    console.log('Enter [0-8]:');
+  },
+  renderInvalidEntry: function () {
+    console.log('That was not a valid move');
   }
 };
 
@@ -270,7 +278,7 @@ controller.init();
 // export for Jasmine testing
 module.exports = {
   board: model.board,
-  boardDisplay: view.boardDisplay,
+  renderBoard: view.renderBoard,
   boardFilled: controller.boardFilled,
   comp: controller.comp,
   getMove: controller.getMove,
