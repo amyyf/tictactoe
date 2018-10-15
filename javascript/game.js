@@ -1,82 +1,84 @@
 const model = {
-  // patterns to win as O (or block O), position to play
-  // 0 indicates an unchosen spot
-  patterns1: [
-    [(/022....../), 0],
-    [(/2..2..0../), 6],
-    [(/......220/), 8],
-    [(/..0..2..2/), 2],
-    [(/0..2..2../), 0],
-    [(/......022/), 6],
-    [(/..2..2..0/), 8],
-    [(/220....../), 2],
-    [(/0...2...2/), 0],
-    [(/..2.2.0../), 6],
-    [(/2...2...0/), 8],
-    [(/..0.2.2../), 2],
-    [(/202....../), 1],
-    [(/2..0..2../), 3],
-    [(/......202/), 7],
-    [(/..2..0..2/), 5],
-    [(/.0..2..2./), 1],
-    [(/...022.../), 3],
-    [(/.2..2..0./), 7],
-    [(/...220.../), 5]
-  ],
-  // patterns to win as X (or block X), position to play
-  patterns2: [
-    [(/0{2}10.010{2}/), 1],
-    [(/011....../), 0],
-    [(/1..1..0../), 6],
-    [(/......110/), 8],
-    [(/..0..1..1/), 2],
-    [(/0..1..1../), 0],
-    [(/......011/), 6],
-    [(/..1..1..0/), 8],
-    [(/110....../), 2],
-    [(/0...1...1/), 0],
-    [(/..1.1.0../), 6],
-    [(/1...1...0/), 8],
-    [(/..0.1.1../), 2],
-    [(/101....../), 1],
-    [(/1..0..1../), 3],
-    [(/......101/), 7],
-    [(/..1..0..1/), 5],
-    [(/.0..1..1./), 1],
-    [(/...011.../), 3],
-    [(/.1..1..0./), 7],
-    [(/...110.../), 5],
-    [(/0101..0../), 0],
-    [(/0..1..010/), 6],
-    [(/..0..1010/), 8],
-    [(/010..1.. /), 2],
-    [(/0{2}11..0../), 0],
-    [(/1..0..010/), 6],
-    [(/..0.110{3}/), 8],
-    [(/10{2}..1..0/), 2],
-    [(/010{2}..1../), 0],
-    [(/0..1..0{2}1/), 6],
-    [(/..1..0{2}10/), 8],
-    [(/10{2}..1..0/), 2]
-  ],
-  // these are the possible winning strings for each player
-  patterns3: [
-    [(/222....../), '2'],
-    [(/...222.../), '2'],
-    [(/......222/), '2'],
-    [(/2..2..2../), '2'],
-    [(/.2..2..2./), '2'],
-    [(/..2..2..2/), '2'],
-    [(/2...2...2/), '2'],
-    [(/..2.2.2../), '2'],
-    [(/111....../), '1'],
-    [(/...111.../), '1'],
-    [(/......111/), '1'],
-    [(/1..1..1../), '1'],
-    [(/.1..1..1./), '1'],
-    [(/..1..1..1/), '1'],
-    [(/1...1...1/), '1'],
-    [(/..1.1.1../), '1']
+  patterns: [
+    // 0 indicates an unchosen spot
+    // patterns to win as O (or block O), position to play
+    [
+      [(/022....../), 0],
+      [(/2..2..0../), 6],
+      [(/......220/), 8],
+      [(/..0..2..2/), 2],
+      [(/0..2..2../), 0],
+      [(/......022/), 6],
+      [(/..2..2..0/), 8],
+      [(/220....../), 2],
+      [(/0...2...2/), 0],
+      [(/..2.2.0../), 6],
+      [(/2...2...0/), 8],
+      [(/..0.2.2../), 2],
+      [(/202....../), 1],
+      [(/2..0..2../), 3],
+      [(/......202/), 7],
+      [(/..2..0..2/), 5],
+      [(/.0..2..2./), 1],
+      [(/...022.../), 3],
+      [(/.2..2..0./), 7],
+      [(/...220.../), 5]
+    ],
+    // patterns to win as X (or block X), position to play
+    [
+      [(/0{2}10.010{2}/), 1],
+      [(/011....../), 0],
+      [(/1..1..0../), 6],
+      [(/......110/), 8],
+      [(/..0..1..1/), 2],
+      [(/0..1..1../), 0],
+      [(/......011/), 6],
+      [(/..1..1..0/), 8],
+      [(/110....../), 2],
+      [(/0...1...1/), 0],
+      [(/..1.1.0../), 6],
+      [(/1...1...0/), 8],
+      [(/..0.1.1../), 2],
+      [(/101....../), 1],
+      [(/1..0..1../), 3],
+      [(/......101/), 7],
+      [(/..1..0..1/), 5],
+      [(/.0..1..1./), 1],
+      [(/...011.../), 3],
+      [(/.1..1..0./), 7],
+      [(/...110.../), 5],
+      [(/0101..0../), 0],
+      [(/0..1..010/), 6],
+      [(/..0..1010/), 8],
+      [(/010..1.. /), 2],
+      [(/0{2}11..0../), 0],
+      [(/1..0..010/), 6],
+      [(/..0.110{3}/), 8],
+      [(/10{2}..1..0/), 2],
+      [(/010{2}..1../), 0],
+      [(/0..1..0{2}1/), 6],
+      [(/..1..0{2}10/), 8],
+      [(/10{2}..1..0/), 2]
+    ],
+    // these are the possible winning strings for each player
+    [
+      [(/222....../), '2'],
+      [(/...222.../), '2'],
+      [(/......222/), '2'],
+      [(/2..2..2../), '2'],
+      [(/.2..2..2./), '2'],
+      [(/..2..2..2/), '2'],
+      [(/2...2...2/), '2'],
+      [(/..2.2.2../), '2'],
+      [(/111....../), '1'],
+      [(/...111.../), '1'],
+      [(/......111/), '1'],
+      [(/1..1..1../), '1'],
+      [(/.1..1..1./), '1'],
+      [(/..1..1..1/), '1'],
+      [(/1...1...1/), '1'],
+      [(/..1.1.1../), '1']
+    ]
   ],
   board: [0, 0, 0, 0, 0, 0, 0, 0, 0],
   X: 'X',
@@ -95,6 +97,7 @@ const model = {
     }
   ],
   currTurn: this.X,
+  gameWon: false,
   shareBoardData: function () {
     return this.board;
   },
@@ -113,21 +116,29 @@ const controller = {
   show: function () {
     const boardData = model.shareBoardData();
     const playerSymbols = model.sharePlayerSymbols();
-    view.renderBoard(boardData, playerSymbols);
+    return view.renderBoard(boardData, playerSymbols);
   },
 
   // this fn controls computer gameplay, runs after player makes a move and gameplay should continue
-  // TODO better naming needed for 'x' and 'comp'
-  comp: function () {
-    let x = this.getPattern1Move();
-    if (x === -1) {
-      x = this.getPattern2Move();
-      if (x === -1) {
-        x = this.getMove();
+  computerPickSpace: function () {
+    let space = 0;
+    space = this.checkPatterns(model.patterns[0]);
+    if (space === -1) {
+      space = this.checkPatterns(model.patterns[1]);
+      if (space === -1) {
+        /* the computer's default/fallback position is the center or, if the center is filled,
+        the first empty space IF there's no possible win on the next move */
+        if (model.board[4] === 0) {
+          space = 4;
+        } else {
+          space = model.board.indexOf(0);
+        }
       }
     }
     // TODO 2 is hard-coded for the computer player's data
-    this.move(x, 2);
+    this.move(space, 2);
+    // check winning patterns
+    this.checkPatterns(model.patterns[2]);
   },
 
   // executes after player gives valid input or computer fn has selected a space
@@ -146,8 +157,8 @@ const controller = {
     return false;
   },
 
-  boardFilled: function () {
-    let x = this.getMove();
+  checkIfBoardFilled: function () {
+    let x = model.board.join('').indexOf(0);
     if (x === -1) {
       this.show();
       view.renderGameOver();
@@ -156,62 +167,30 @@ const controller = {
     return false;
   },
 
-  /* TODO extreme repetition in below three functions - need to separate concerns and combine functions
-  1. check which player is currently active
-  2. check that list of moves
-  3. move
-  4. check for win
-  5. check for game over
-  */
-  winner: function () {
-    let boardString = model.board.join('');
-    let theWinner = null;
-    for (let i = 0; i < model.patterns3.length; i++) {
-      const array = boardString.match(model.patterns3[i][0]);
+  checkPatterns: function (patternsToCheck) {
+    const boardString = model.board.join('');
+    for (let i = 0; i < patternsToCheck.length; i++) {
+      const array = boardString.match(patternsToCheck[i][0]);
       if (array) {
-        theWinner = model.patterns3[i][1];
-      }
-    }
-    // TODO implement message or similar to congratulate winner
-    if (theWinner) {
-      this.show();
-      view.renderGameOver();
-      return true;
-    }
-    return false;
-  },
-
-  // the below 3 fns are how the computer makes its moves
-  getPattern1Move: function () {
-    let boardString = model.board.join('');
-    // continues first pattern that matches
-    for (let i = 0; i < model.patterns1.length; i++) {
-      const array = boardString.match(model.patterns1[i][0]);
-      if (array) {
-        return model.patterns1[i][1];
+        if (patternsToCheck === model.patterns[2]) {
+          model.gameWon = true;
+          this.winGame();
+        } else {
+          console.log(patternsToCheck[i][1]);
+          return patternsToCheck[i][1];
+        }
       }
     }
     return -1;
   },
 
-  getPattern2Move: function () {
-    let boardString = model.board.join('');
-    for (let i = 0; i < model.patterns2.length; i++) {
-      let array = boardString.match(model.patterns2[i][0]);
-      if (array) {
-        return model.patterns2[i][1];
-      }
+  winGame: function () {
+    if (model.gameWon === false) {
+      return;
     }
-    return -1;
-  },
-
-  /* the computer's default/fallback position is the center or, if the center is filled,
-  the first empty space IF there's no possible win on the next move */
-  getMove: function () {
-    if (model.board[4] === 0) {
-      return 4;
-    }
-    return model.board.indexOf(0);
+    this.show();
+    view.renderGameOver();
+    return true;
   },
 
   exit: function () {
@@ -219,25 +198,24 @@ const controller = {
   },
 
   play: function () {
-    this.show();
     const boundController = this;
+    this.show();
     view.renderInstructions();
     process.openStdin().on('data', function (res) {
       // if move is valid, check if gameplay should end
       // TODO 1 is hard-coded for player 1's data
       if (boundController.move(res, 1)) {
-        if (boundController.winner() || boundController.boardFilled()) {
+        if (boundController.winGame() || boundController.checkIfBoardFilled()) {
           boundController.exit();
         } else {
           // if gameplay should continue, run compute fn to execute computer's move
-          boundController.comp();
-          if (boundController.winner() || boundController.boardFilled()) {
+          boundController.computerPickSpace();
+          if (boundController.winGame() || boundController.checkIfBoardFilled()) {
             boundController.exit();
           } else {
             boundController.show();
           }
         }
-        // TODO need an 'else' to handle (move(res, X) === false) - meaning bad data entry
       } else {
         view.renderInvalidEntry();
       }
@@ -279,8 +257,8 @@ controller.init();
 module.exports = {
   board: model.board,
   renderBoard: view.renderBoard,
-  boardFilled: controller.boardFilled,
-  comp: controller.comp,
+  checkIfBoardFilled: controller.checkIfBoardFilled,
+  computerPickSpace: controller.computerPickSpace,
   getMove: controller.getMove,
   move: controller.move,
   play: controller.play,
