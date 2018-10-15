@@ -101,6 +101,11 @@ const model = {
   shareBoardData: function () {
     return this.board;
   },
+
+  sharePatterns: function () {
+    return this.patterns;
+  },
+
   sharePlayerSymbols: function () {
     const player1Symbol = this.players[0].symbol;
     const player2Symbol = this.players[1].symbol;
@@ -121,24 +126,26 @@ const controller = {
 
   // this fn controls computer gameplay, runs after player makes a move and gameplay should continue
   computerPickSpace: function () {
+    const patterns = model.sharePatterns();
+    const board = model.shareBoardData();
     let space = 0;
-    space = this.checkPatterns(model.patterns[0]);
+    space = this.checkPatterns(patterns[0]);
     if (space === -1) {
-      space = this.checkPatterns(model.patterns[1]);
+      space = this.checkPatterns(patterns[1]);
       if (space === -1) {
         /* the computer's default/fallback position is the center or, if the center is filled,
         the first empty space IF there's no possible win on the next move */
-        if (model.board[4] === 0) {
+        if (board[4] === 0) {
           space = 4;
         } else {
-          space = model.board.indexOf(0);
+          space = board.indexOf(0);
         }
       }
     }
     // TODO 2 is hard-coded for the computer player's data
     this.move(space, 2);
     // check winning patterns
-    this.checkPatterns(model.patterns[2]);
+    this.checkPatterns(patterns[2]);
   },
 
   // executes after player gives valid input or computer fn has selected a space
