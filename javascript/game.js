@@ -264,5 +264,5 @@ module.exports = {
   play: controller.play,
   players: model.players,
   show: controller.show,
-  winner: controller.winner
+  gameWon: model.gameWon
 };

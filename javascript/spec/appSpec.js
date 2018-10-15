@@ -23,9 +23,9 @@ describe('During gameplay', function () {
 describe('To win', function () {
   it('board not full at game start', function () {
     this.gameMove = game.gameMove;
-    expect(game.boardFilled()).toBeFalsy();
+    expect(game.checkIfBoardFilled()).toBeFalsy();
   });
   it('game has not been won at game start', function () {
-    expect(game.winner()).toBeFalsy();
+    expect(game.gameWon).toBeFalsy();
   });
 });
