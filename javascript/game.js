@@ -94,14 +94,25 @@ const model = {
       data: 2
     }
   ],
+  currentPlayer: null,
   currTurn: this.X,
   gameWon: false,
+  setCurrentPlayer: function (player, selection) {
+    if (!this.currentPlayer && selection.toString('utf8').slice(0, 1) === 'y') {
+      this.currentPlayer = player;
+      console.log('setting current player', this.currentPlayer);
+    }
+  },
   setPlayerData: function (player, key, value) {
     const position = player - 1;
     this.players[position][key] = value;
   },
   shareBoardData: function () {
     return this.board;
+  },
+
+  shareCurrentPlayer: function () {
+    return this.currentPlayer;
   },
 
   sharePatterns: function () {
@@ -154,31 +165,31 @@ const controller = {
 
   createPlayers: function () {
     const inputStream = process.openStdin();
-    let firstPositionTaken = false;
     this.updatePlayer(1, 'type', inputStream)
       .then(() => this.updatePlayer(1, 'symbol', inputStream))
       .then(() => this.updatePlayer(1, 'position', inputStream))
-      .then(response => {
-        if (response === 'y') {
-          firstPositionTaken = true;
-        }
-      })
       .then(() => this.updatePlayer(2, 'type', inputStream))
       .then(() => this.updatePlayer(2, 'symbol', inputStream))
-      .then(() => {
-        if (firstPositionTaken === false) {
-          this.updatePlayer(2, 'position', inputStream);
-        }
-      })
-      .then(() => console.log(model.players))
-      .then(() => this.play());
+      .then(() => this.updatePlayer(2, 'position', inputStream))
+      .then(() => console.log(model.players, model.currentPlayer))
+      // .then(() => this.play());
+      .then(() => this.exit());
   },
 
   updatePlayer: function (player, prop, stream) {
+    // return early if currentPlayer has already been assigned
+    if (prop === 'position' && model.shareCurrentPlayer()) {
+      return;
+    }
     view.sayMessage(player, view.messages.playerSetup[prop]);
     const playerData = new Promise(function (resolve, reject) {
       stream.once('data', res => {
-        model.setPlayerData(player, prop, res);
+        if (prop === 'position') {
+          console.log('position prop seen', res);
+          model.setCurrentPlayer(player, res);
+        } else {
+          model.setPlayerData(player, prop, res);
+        }
         resolve(player[prop]);
       });
     });
