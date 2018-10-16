@@ -177,12 +177,13 @@ const controller = {
   },
 
   // TODO separate concerns in below function
+  // TODO handle bad data entry
   updatePlayer: function (player, prop, stream) {
     // return early if currentPlayer has already been assigned
     if (prop === 'position' && model.shareCurrentPlayer()) {
       return;
     }
-    view.sayMessage(player, view.messages.playerSetup[prop]);
+    view.sayMessage(view.messages.playerSetup[prop]);
     const playerData = new Promise(function (resolve, reject) {
       stream.once('data', res => {
         let convertedRes = res.toString('utf8').slice(0, 1);
@@ -299,6 +300,7 @@ const view = {
     };
     this.sayMessage(this.messages.welcome);
   },
+
   // TODO "the existing code is so coupled to the console"
   renderBoard: function (boardData, playerSymbols) {
     const [ player1Symbol, player2Symbol ] = playerSymbols;
@@ -315,7 +317,8 @@ const view = {
     ' ' + boardSymbols[3] + ' |' + ' ' + boardSymbols[4] + ' |' + ' ' + boardSymbols[5] + '\n===+===+===\n' +
     ' ' + boardSymbols[6] + ' |' + ' ' + boardSymbols[7] + ' |' + ' ' + boardSymbols[8]);
   },
-  sayMessage: function (player, message) {
+
+  sayMessage: function (message) {
     console.log(message);
   }
 };
@@ -325,16 +328,17 @@ controller.init();
 // export for Jasmine testing
 module.exports = {
   board: model.board,
-  createPlayers: controller.createPlayers,
-  renderBoard: view.renderBoard,
   checkIfBoardFilled: controller.checkIfBoardFilled,
   computerPickSpace: controller.computerPickSpace,
+  createPlayers: controller.createPlayers,
+  gameWon: model.gameWon,
   getMove: controller.getMove,
   move: controller.move,
   play: controller.play,
   players: model.players,
+  renderBoard: view.renderBoard,
+  setPlayerData: model.setPlayerData,
   show: controller.show,
-  gameWon: model.gameWon,
-  updatePlayer: controller.updatePlayer,
-  setPlayerData: model.setPlayerData
+  startingPlayer: model.currentPlayer,
+  updatePlayer: controller.updatePlayer
 };
