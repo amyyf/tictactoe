@@ -95,9 +95,8 @@ const model = {
     }
   ],
   currentPlayer: null,
-  currTurn: this.X,
   gameWon: false,
-  setCurrentPlayer: function (player, selection) {
+  setStartingPlayer: function (player, selection) {
     if (!this.currentPlayer && selection === 'y') {
       this.currentPlayer = player;
     }
@@ -122,6 +121,10 @@ const model = {
     const player1Symbol = this.players[0].symbol;
     const player2Symbol = this.players[1].symbol;
     return [player1Symbol, player2Symbol];
+  },
+
+  updateCurrentPlayer: function () {
+    this.currentPlayer === 1 ? this.currentPlayer = 2 : this.currentPlayer = 1;
   }
 };
 
@@ -184,7 +187,7 @@ const controller = {
       stream.once('data', res => {
         let convertedRes = res.toString('utf8').slice(0, 1);
         if (prop === 'position') {
-          model.setCurrentPlayer(player, convertedRes);
+          model.setStartingPlayer(player, convertedRes);
         } else {
           if (prop === 'type' && convertedRes === '1') {
             convertedRes = 'human';
@@ -208,7 +211,7 @@ const controller = {
     // unary plus ('+') converts position to a number
     if (+pos >= 0 && +pos <= 8 && !isNaN(+pos) && model.board[+pos] === 0) {
       model.board.splice(+pos, 1, x);
-      model.currTurn = (x === model.X) ? model.O : model.X;
+      model.updateCurrentPlayer();
       return true;
     }
     // TODO handle bad data here or in play fn
