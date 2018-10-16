@@ -98,9 +98,8 @@ const model = {
   currTurn: this.X,
   gameWon: false,
   setCurrentPlayer: function (player, selection) {
-    if (!this.currentPlayer && selection.toString('utf8').slice(0, 1) === 'y') {
+    if (!this.currentPlayer && selection === 'y') {
       this.currentPlayer = player;
-      console.log('setting current player', this.currentPlayer);
     }
   },
   setPlayerData: function (player, key, value) {
@@ -171,11 +170,10 @@ const controller = {
       .then(() => this.updatePlayer(2, 'type', inputStream))
       .then(() => this.updatePlayer(2, 'symbol', inputStream))
       .then(() => this.updatePlayer(2, 'position', inputStream))
-      .then(() => console.log(model.players, model.currentPlayer))
-      // .then(() => this.play());
-      .then(() => this.exit());
+      .then(() => this.play());
   },
 
+  // TODO separate concerns in below function
   updatePlayer: function (player, prop, stream) {
     // return early if currentPlayer has already been assigned
     if (prop === 'position' && model.shareCurrentPlayer()) {
@@ -184,11 +182,16 @@ const controller = {
     view.sayMessage(player, view.messages.playerSetup[prop]);
     const playerData = new Promise(function (resolve, reject) {
       stream.once('data', res => {
+        let convertedRes = res.toString('utf8').slice(0, 1);
         if (prop === 'position') {
-          console.log('position prop seen', res);
-          model.setCurrentPlayer(player, res);
+          model.setCurrentPlayer(player, convertedRes);
         } else {
-          model.setPlayerData(player, prop, res);
+          if (prop === 'type' && convertedRes === '1') {
+            convertedRes = 'human';
+          } else if (prop === 'type' && convertedRes === '2') {
+            convertedRes = 'computer';
+          }
+          model.setPlayerData(player, prop, convertedRes);
         }
         resolve(player[prop]);
       });
@@ -300,38 +303,15 @@ const view = {
       if (space === 0) {
         return ' ';
       } else if (space === 1) {
-        return player1Symbol.toString('utf8').slice(0, 1);
+        return player1Symbol;
       } else if (space === 2) {
-        return player2Symbol.toString('utf8').slice(0, 1);
+        return player2Symbol;
       }
     });
     console.log(' ' + boardSymbols[0] + ' |' + ' ' + boardSymbols[1] + ' |' + ' ' + boardSymbols[2] + '\n===+===+===\n' +
     ' ' + boardSymbols[3] + ' |' + ' ' + boardSymbols[4] + ' |' + ' ' + boardSymbols[5] + '\n===+===+===\n' +
     ' ' + boardSymbols[6] + ' |' + ' ' + boardSymbols[7] + ' |' + ' ' + boardSymbols[8]);
   },
-  // getPlayer1Type: function (stream) {
-  //   console.log('Is Player 1 a human or computer? Enter \'1\' for human and \'2\' for computer.');
-  //   stream.once('data', function (res) {
-  //     if (res === 1 || res === 2) {
-  //       return res;
-  //     } else {
-  //       // TODO below is hard-coded
-  //       controller.exit();
-  //     }
-  //   });
-  // },
-  // getPlayer1Symbol: function (stream) {
-  //   console.log('What symbol will Player 1 use? Enter the symbol and press enter to confirm.');
-  //   stream.once('data', function (res) {
-  //     return res;
-  //   });
-  // },
-  // getPlayer1Position: function (stream) {
-  //   console.log('Will Player 1 play first? Enter y/n.');
-  //   stream.once('data', function (res) {
-  //     return res;
-  //   });
-  // },
   sayMessage: function (player, message) {
     console.log(message);
   }
