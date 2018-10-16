@@ -1,14 +1,21 @@
-/* globals describe, it, expect */
+/* globals expectAsync describe, it, expect */
 
 const game = require('../game');
 
 describe('The game board', function () {
-  it('exists', function () {
+  it('exists and is the correct length', function () {
     expect(game.board).toBeDefined();
+    expect(game.board.length).toBe(9);
   });
   it('renders in the console', function () {
     const board = (/........./);
     expect(game.show()).toMatch(board);
+  });
+});
+
+describe('Players', function () {
+  it('receive new properties from user input', function () {
+    expectAsync(game.updatePlayer()).toBeResolved();
   });
 });
 

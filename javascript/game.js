@@ -87,17 +87,19 @@ const model = {
   players: [
     {
       name: 'player1',
-      data: 1,
-      symbol: 'X'
+      data: 1
     },
     {
       name: 'player2',
-      data: 2,
-      symbol: 'O'
+      data: 2
     }
   ],
   currTurn: this.X,
   gameWon: false,
+  setPlayerData: function (player, key, value) {
+    const position = player - 1;
+    this.players[position][key] = value;
+  },
   shareBoardData: function () {
     return this.board;
   },
@@ -115,7 +117,9 @@ const model = {
 
 const controller = {
   init: function () {
-    this.play();
+    view.init();
+    this.createPlayers();
+    // this.play();
   },
 
   show: function () {
@@ -148,6 +152,39 @@ const controller = {
     this.checkPatterns(patterns[2]);
   },
 
+  createPlayers: function () {
+    const inputStream = process.openStdin();
+    let firstPositionTaken = false;
+    this.updatePlayer(1, 'type', inputStream)
+      .then(() => this.updatePlayer(1, 'symbol', inputStream))
+      .then(() => this.updatePlayer(1, 'position', inputStream))
+      .then(response => {
+        if (response === 'y') {
+          firstPositionTaken = true;
+        }
+      })
+      .then(() => this.updatePlayer(2, 'type', inputStream))
+      .then(() => this.updatePlayer(2, 'symbol', inputStream))
+      .then(() => {
+        if (firstPositionTaken === false) {
+          this.updatePlayer(2, 'position', inputStream);
+        }
+      })
+      .then(() => console.log(model.players))
+      .then(() => this.play());
+  },
+
+  updatePlayer: function (player, prop, stream) {
+    view.sayMessage(player, view.messages.playerSetup[prop]);
+    const playerData = new Promise(function (resolve, reject) {
+      stream.once('data', res => {
+        model.setPlayerData(player, prop, res);
+        resolve(player[prop]);
+      });
+    });
+    return playerData;
+  },
+
   // executes after player gives valid input or computer fn has selected a space
   move: function (pos, x) {
     // checks that the correct player is moving
@@ -168,7 +205,7 @@ const controller = {
     let x = model.board.join('').indexOf(0);
     if (x === -1) {
       this.show();
-      view.renderGameOver();
+      view.sayMessage(view.messages.gameOver);
       return true;
     }
     return false;
@@ -196,7 +233,7 @@ const controller = {
       return;
     }
     this.show();
-    view.renderGameOver();
+    view.sayMessage(view.messages.gameOver);
     return true;
   },
 
@@ -207,7 +244,7 @@ const controller = {
   play: function () {
     const boundController = this;
     this.show();
-    view.renderInstructions();
+    view.sayMessage(view.messages.instructions);
     process.openStdin().on('data', function (res) {
       // if move is valid, check if gameplay should end
       // TODO 1 is hard-coded for player 1's data
@@ -224,13 +261,27 @@ const controller = {
           }
         }
       } else {
-        view.renderInvalidEntry();
+        view.sayMessage(view.messages.invalidEntry);
       }
     });
   }
 };
 
 const view = {
+  init: function () {
+    this.messages = {
+      gameOver: 'Game over',
+      instructions: 'Enter [0-8]:',
+      invalidEntry: 'That was not a valid move',
+      playerSetup: {
+        position: 'Will Player 1 play first? Enter y/n.',
+        symbol: 'What symbol will Player 1 use? Enter the symbol and press enter to confirm.',
+        type: 'Is Player 1 a human or computer? Enter \'1\' for human and \'2\' for computer.'
+      },
+      welcome: 'Welcome to Tic Tac Toe! First you\'ll need to create your players. We\'ll set up one player at a time.'
+    };
+    this.sayMessage(this.messages.welcome);
+  },
   // TODO "the existing code is so coupled to the console"
   renderBoard: function (boardData, playerSymbols) {
     const [ player1Symbol, player2Symbol ] = playerSymbols;
@@ -238,23 +289,40 @@ const view = {
       if (space === 0) {
         return ' ';
       } else if (space === 1) {
-        return player1Symbol;
+        return player1Symbol.toString('utf8').slice(0, 1);
       } else if (space === 2) {
-        return player2Symbol;
+        return player2Symbol.toString('utf8').slice(0, 1);
       }
     });
     console.log(' ' + boardSymbols[0] + ' |' + ' ' + boardSymbols[1] + ' |' + ' ' + boardSymbols[2] + '\n===+===+===\n' +
     ' ' + boardSymbols[3] + ' |' + ' ' + boardSymbols[4] + ' |' + ' ' + boardSymbols[5] + '\n===+===+===\n' +
     ' ' + boardSymbols[6] + ' |' + ' ' + boardSymbols[7] + ' |' + ' ' + boardSymbols[8]);
   },
-  renderGameOver: function () {
-    console.log('Game over');
-  },
-  renderInstructions: function () {
-    console.log('Enter [0-8]:');
-  },
-  renderInvalidEntry: function () {
-    console.log('That was not a valid move');
+  // getPlayer1Type: function (stream) {
+  //   console.log('Is Player 1 a human or computer? Enter \'1\' for human and \'2\' for computer.');
+  //   stream.once('data', function (res) {
+  //     if (res === 1 || res === 2) {
+  //       return res;
+  //     } else {
+  //       // TODO below is hard-coded
+  //       controller.exit();
+  //     }
+  //   });
+  // },
+  // getPlayer1Symbol: function (stream) {
+  //   console.log('What symbol will Player 1 use? Enter the symbol and press enter to confirm.');
+  //   stream.once('data', function (res) {
+  //     return res;
+  //   });
+  // },
+  // getPlayer1Position: function (stream) {
+  //   console.log('Will Player 1 play first? Enter y/n.');
+  //   stream.once('data', function (res) {
+  //     return res;
+  //   });
+  // },
+  sayMessage: function (player, message) {
+    console.log(message);
   }
 };
 
@@ -263,6 +331,7 @@ controller.init();
 // export for Jasmine testing
 module.exports = {
   board: model.board,
+  createPlayers: controller.createPlayers,
   renderBoard: view.renderBoard,
   checkIfBoardFilled: controller.checkIfBoardFilled,
   computerPickSpace: controller.computerPickSpace,
@@ -271,5 +340,7 @@ module.exports = {
   play: controller.play,
   players: model.players,
   show: controller.show,
-  gameWon: model.gameWon
+  gameWon: model.gameWon,
+  updatePlayer: controller.updatePlayer,
+  setPlayerData: model.setPlayerData
 };
