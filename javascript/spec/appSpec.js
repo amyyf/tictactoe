@@ -17,6 +17,15 @@ describe('Players', function () {
   it('receive new properties from user input', function () {
     expectAsync(game.updatePlayer()).toBeResolved();
   });
+  it('are given starting positions by the user', function () {
+    expect(game.startingPlayer).toBe(null);
+  });
+  it('are given symbols by the user', function () {
+    expect(game.players[0].symbol && game.players[1].symbol).toBeUndefined();
+  });
+  it('are assigned human/computer type by the user', function () {
+    expect(game.players[0].type && game.players[1].type).toBeUndefined();
+  });
 });
 
 describe('During gameplay', function () {
