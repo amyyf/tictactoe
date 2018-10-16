@@ -1,110 +1,114 @@
 const model = {
-  patterns: [
-    // 0 indicates an unchosen spot
-    // patterns to win as O (or block O), position to play
-    [
-      [(/022....../), 0],
-      [(/2..2..0../), 6],
-      [(/......220/), 8],
-      [(/..0..2..2/), 2],
-      [(/0..2..2../), 0],
-      [(/......022/), 6],
-      [(/..2..2..0/), 8],
-      [(/220....../), 2],
-      [(/0...2...2/), 0],
-      [(/..2.2.0../), 6],
-      [(/2...2...0/), 8],
-      [(/..0.2.2../), 2],
-      [(/202....../), 1],
-      [(/2..0..2../), 3],
-      [(/......202/), 7],
-      [(/..2..0..2/), 5],
-      [(/.0..2..2./), 1],
-      [(/...022.../), 3],
-      [(/.2..2..0./), 7],
-      [(/...220.../), 5]
-    ],
-    // patterns to win as X (or block X), position to play
-    [
-      [(/0{2}10.010{2}/), 1],
-      [(/011....../), 0],
-      [(/1..1..0../), 6],
-      [(/......110/), 8],
-      [(/..0..1..1/), 2],
-      [(/0..1..1../), 0],
-      [(/......011/), 6],
-      [(/..1..1..0/), 8],
-      [(/110....../), 2],
-      [(/0...1...1/), 0],
-      [(/..1.1.0../), 6],
-      [(/1...1...0/), 8],
-      [(/..0.1.1../), 2],
-      [(/101....../), 1],
-      [(/1..0..1../), 3],
-      [(/......101/), 7],
-      [(/..1..0..1/), 5],
-      [(/.0..1..1./), 1],
-      [(/...011.../), 3],
-      [(/.1..1..0./), 7],
-      [(/...110.../), 5],
-      [(/0101..0../), 0],
-      [(/0..1..010/), 6],
-      [(/..0..1010/), 8],
-      [(/010..1.. /), 2],
-      [(/0{2}11..0../), 0],
-      [(/1..0..010/), 6],
-      [(/..0.110{3}/), 8],
-      [(/10{2}..1..0/), 2],
-      [(/010{2}..1../), 0],
-      [(/0..1..0{2}1/), 6],
-      [(/..1..0{2}10/), 8],
-      [(/10{2}..1..0/), 2]
-    ],
-    // these are the possible winning strings for each player
-    [
-      [(/222....../), '2'],
-      [(/...222.../), '2'],
-      [(/......222/), '2'],
-      [(/2..2..2../), '2'],
-      [(/.2..2..2./), '2'],
-      [(/..2..2..2/), '2'],
-      [(/2...2...2/), '2'],
-      [(/..2.2.2../), '2'],
-      [(/111....../), '1'],
-      [(/...111.../), '1'],
-      [(/......111/), '1'],
-      [(/1..1..1../), '1'],
-      [(/.1..1..1./), '1'],
-      [(/..1..1..1/), '1'],
-      [(/1...1...1/), '1'],
-      [(/..1.1.1../), '1']
-    ]
-  ],
-  board: [0, 0, 0, 0, 0, 0, 0, 0, 0],
-  X: 'X',
-  O: 'O',
-  // TODO generate players and symbols from user input
-  players: [
-    {
-      name: 'player1',
-      data: 1
-    },
-    {
-      name: 'player2',
-      data: 2
-    }
-  ],
-  currentPlayer: null,
-  gameWon: false,
+
+  init: function () {
+    this.patterns = [
+      // 0 indicates an unchosen spot
+      // patterns to win as O (or block O), position to play
+      [
+        [(/022....../), 0],
+        [(/2..2..0../), 6],
+        [(/......220/), 8],
+        [(/..0..2..2/), 2],
+        [(/0..2..2../), 0],
+        [(/......022/), 6],
+        [(/..2..2..0/), 8],
+        [(/220....../), 2],
+        [(/0...2...2/), 0],
+        [(/..2.2.0../), 6],
+        [(/2...2...0/), 8],
+        [(/..0.2.2../), 2],
+        [(/202....../), 1],
+        [(/2..0..2../), 3],
+        [(/......202/), 7],
+        [(/..2..0..2/), 5],
+        [(/.0..2..2./), 1],
+        [(/...022.../), 3],
+        [(/.2..2..0./), 7],
+        [(/...220.../), 5]
+      ],
+      // patterns to win as X (or block X), position to play
+      [
+        [(/0{2}10.010{2}/), 1],
+        [(/011....../), 0],
+        [(/1..1..0../), 6],
+        [(/......110/), 8],
+        [(/..0..1..1/), 2],
+        [(/0..1..1../), 0],
+        [(/......011/), 6],
+        [(/..1..1..0/), 8],
+        [(/110....../), 2],
+        [(/0...1...1/), 0],
+        [(/..1.1.0../), 6],
+        [(/1...1...0/), 8],
+        [(/..0.1.1../), 2],
+        [(/101....../), 1],
+        [(/1..0..1../), 3],
+        [(/......101/), 7],
+        [(/..1..0..1/), 5],
+        [(/.0..1..1./), 1],
+        [(/...011.../), 3],
+        [(/.1..1..0./), 7],
+        [(/...110.../), 5],
+        [(/0101..0../), 0],
+        [(/0..1..010/), 6],
+        [(/..0..1010/), 8],
+        [(/010..1.. /), 2],
+        [(/0{2}11..0../), 0],
+        [(/1..0..010/), 6],
+        [(/..0.110{3}/), 8],
+        [(/10{2}..1..0/), 2],
+        [(/010{2}..1../), 0],
+        [(/0..1..0{2}1/), 6],
+        [(/..1..0{2}10/), 8],
+        [(/10{2}..1..0/), 2]
+      ],
+      // these are the possible winning strings for each player
+      [
+        [(/222....../), '2'],
+        [(/...222.../), '2'],
+        [(/......222/), '2'],
+        [(/2..2..2../), '2'],
+        [(/.2..2..2./), '2'],
+        [(/..2..2..2/), '2'],
+        [(/2...2...2/), '2'],
+        [(/..2.2.2../), '2'],
+        [(/111....../), '1'],
+        [(/...111.../), '1'],
+        [(/......111/), '1'],
+        [(/1..1..1../), '1'],
+        [(/.1..1..1./), '1'],
+        [(/..1..1..1/), '1'],
+        [(/1...1...1/), '1'],
+        [(/..1.1.1../), '1']
+      ]
+    ];
+    this.board = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+    // TODO name formatted like Player 1?
+    this.players = [
+      {
+        name: 'player1',
+        data: 1
+      },
+      {
+        name: 'player2',
+        data: 2
+      }
+    ];
+    this.currentPlayer = null;
+    this.gameWon = false;
+  },
+
   setStartingPlayer: function (player, selection) {
     if (!this.currentPlayer && selection === 'y') {
       this.currentPlayer = player;
     }
   },
+
   setPlayerData: function (player, key, value) {
     const position = player - 1;
     this.players[position][key] = value;
   },
+
   shareBoardData: function () {
     return this.board;
   },
@@ -129,10 +133,12 @@ const model = {
 };
 
 const controller = {
+
   init: function () {
+    model.init();
     view.init();
-    this.createPlayers();
-    // this.play();
+    this.createPlayers()
+      .then(() => this.play());
   },
 
   show: function () {
@@ -142,6 +148,7 @@ const controller = {
   },
 
   // this fn controls computer gameplay, runs after player makes a move and gameplay should continue
+  // TODO separate concerns with move and check for win
   computerPickSpace: function () {
     const patterns = model.sharePatterns();
     const board = model.shareBoardData();
@@ -167,17 +174,17 @@ const controller = {
 
   createPlayers: function () {
     const inputStream = process.openStdin();
-    this.updatePlayer(1, 'type', inputStream)
+    return this.updatePlayer(1, 'type', inputStream)
       .then(() => this.updatePlayer(1, 'symbol', inputStream))
       .then(() => this.updatePlayer(1, 'position', inputStream))
       .then(() => this.updatePlayer(2, 'type', inputStream))
       .then(() => this.updatePlayer(2, 'symbol', inputStream))
-      .then(() => this.updatePlayer(2, 'position', inputStream))
-      .then(() => this.play());
+      .then(() => this.updatePlayer(2, 'position', inputStream));
   },
 
   // TODO separate concerns in below function
   // TODO handle bad data entry
+  // TODO implement catch
   updatePlayer: function (player, prop, stream) {
     // return early if currentPlayer has already been assigned
     if (prop === 'position' && model.shareCurrentPlayer()) {
@@ -246,6 +253,7 @@ const controller = {
     return -1;
   },
 
+  // TODO gameWon status no longer needed? it's probably a good check, though
   winGame: function () {
     if (model.gameWon === false) {
       return;
@@ -286,6 +294,7 @@ const controller = {
 };
 
 const view = {
+
   init: function () {
     this.messages = {
       gameOver: 'Game over',
