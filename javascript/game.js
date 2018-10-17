@@ -99,7 +99,7 @@ const model = {
   },
 
   setStartingPlayer: function (player, selection) {
-    if (!this.currentPlayer && selection === 'y') {
+    if (this.currentPlayer === null && selection === 'y') {
       this.currentPlayer = player;
     }
   },
@@ -114,7 +114,9 @@ const model = {
   },
 
   shareCurrentPlayer: function () {
-    return this.currentPlayer;
+    const id = this.currentPlayer;
+    // correct to zero-index
+    return this.players[id - 1];
   },
 
   sharePatterns: function () {
@@ -127,7 +129,7 @@ const model = {
     return [player1Symbol, player2Symbol];
   },
 
-  updateCurrentPlayer: function () {
+  toggleCurrentPlayer: function () {
     this.currentPlayer === 1 ? this.currentPlayer = 2 : this.currentPlayer = 1;
   }
 };
@@ -138,10 +140,11 @@ const controller = {
     model.init();
     view.init();
     this.createPlayers()
-      .then(() => this.play());
+      .then(() => this.runPlaySequence());
   },
 
   show: function () {
+    console.log('showing');
     const boardData = model.shareBoardData();
     const playerSymbols = model.sharePlayerSymbols();
     return view.renderBoard(boardData, playerSymbols);
@@ -149,27 +152,28 @@ const controller = {
 
   // this fn controls computer gameplay, runs after player makes a move and gameplay should continue
   // TODO separate concerns with move and check for win
-  computerPickSpace: function () {
+  computerPickSpace: function (currentPlayer) {
+    let space = 0;
+    console.log('picking a space');
     const patterns = model.sharePatterns();
     const board = model.shareBoardData();
-    let space = 0;
-    space = this.checkPatterns(patterns[0]);
+    const boundController = this;
+    space = boundController.checkPatterns(patterns[0]);
+    console.log(space);
     if (space === -1) {
-      space = this.checkPatterns(patterns[1]);
+      space = boundController.checkPatterns(patterns[1]);
       if (space === -1) {
         /* the computer's default/fallback position is the center or, if the center is filled,
         the first empty space IF there's no possible win on the next move */
         if (board[4] === 0) {
           space = 4;
+          console.log('picked 4');
         } else {
           space = board.indexOf(0);
         }
       }
     }
-    // TODO 2 is hard-coded for the computer player's data
-    this.move(space, 2);
-    // check winning patterns
-    this.checkPatterns(patterns[2]);
+    return space;
   },
 
   createPlayers: function () {
@@ -212,14 +216,15 @@ const controller = {
 
   // executes after player gives valid input or computer fn has selected a space
   move: function (pos, x) {
+    console.log('moving');
     // checks that the correct player is moving
     // if (x !== model.currTurn) {
     //   return false;
     // }
     // unary plus ('+') converts position to a number
     if (+pos >= 0 && +pos <= 8 && !isNaN(+pos) && model.board[+pos] === 0) {
+      // TODO need update board function
       model.board.splice(+pos, 1, x);
-      model.updateCurrentPlayer();
       return true;
     }
     // TODO handle bad data here or in play fn
@@ -236,9 +241,17 @@ const controller = {
     return false;
   },
 
+  checkForGameOver: function () {
+    if (this.winGame() || this.checkIfBoardFilled()) {
+      this.exit();
+    }
+  },
+
   checkPatterns: function (patternsToCheck) {
+    console.log('checking patterns');
     const boardString = model.board.join('');
     for (let i = 0; i < patternsToCheck.length; i++) {
+      console.log('in for loop');
       const array = boardString.match(patternsToCheck[i][0]);
       if (array) {
         if (patternsToCheck === model.patterns[2]) {
@@ -267,29 +280,55 @@ const controller = {
     process.exit();
   },
 
-  play: function () {
-    const boundController = this;
+  runPlaySequence: function () {
     this.show();
     view.sayMessage(view.messages.instructions);
-    process.openStdin().on('data', function (res) {
-      // if move is valid, check if gameplay should end
-      // TODO 1 is hard-coded for player 1's data
-      if (boundController.move(res, 1)) {
-        if (boundController.winGame() || boundController.checkIfBoardFilled()) {
-          boundController.exit();
-        } else {
-          // if gameplay should continue, run compute fn to execute computer's move
-          boundController.computerPickSpace();
-          if (boundController.winGame() || boundController.checkIfBoardFilled()) {
-            boundController.exit();
-          } else {
+    const inputStream = process.openStdin();
+    // only nine moves are possible in a game of tic tac toe
+    return this.play(inputStream)
+      .then(() => this.play(inputStream))
+      .then(() => this.play(inputStream))
+      .then(() => this.play(inputStream))
+      .then(() => this.play(inputStream))
+      .then(() => this.play(inputStream))
+      .then(() => this.play(inputStream))
+      .then(() => this.play(inputStream))
+      .then(() => this.play(inputStream))
+      .then(() => this.checkPatterns(model.sharePatterns()[3]))
+      .catch((e) => console.log(e));
+  },
+
+  play: function (inputStream) {
+    const boundController = this;
+    const currentPlayer = model.shareCurrentPlayer();
+    const play = new Promise(function (resolve, reject) {
+      if (currentPlayer.type === 'human') {
+        console.log('human playing, ' + currentPlayer.type);
+        inputStream.once('data', function (res) {
+          if (boundController.move(res, currentPlayer.data)) {
             boundController.show();
+            boundController.checkForGameOver();
+            model.toggleCurrentPlayer();
+          } else {
+            view.sayMessage(view.messages.invalidEntry);
           }
-        }
-      } else {
-        view.sayMessage(view.messages.invalidEntry);
+          resolve(currentPlayer);
+          reject(console.log('whoops in human'));
+        });
+      } else if (currentPlayer.type === 'computer') {
+        setTimeout(function () {
+          console.log('computer playing, ' + currentPlayer);
+          const space = boundController.computerPickSpace(currentPlayer);
+          boundController.move(space, currentPlayer.data);
+          boundController.show();
+          boundController.checkForGameOver();
+          model.toggleCurrentPlayer();
+          resolve(currentPlayer);
+          reject(console.log('whoops in computer'));
+        }, 500);
       }
     });
+    return play;
   }
 };
 
