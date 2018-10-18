@@ -167,41 +167,41 @@ const controller = {
   },
 
   createPlayers: function () {
-    const inputStream = process.openStdin();
-    return this.updatePlayer(1, 'type', inputStream)
-      .then(() => this.updatePlayer(1, 'symbol', inputStream))
-      .then(() => this.updatePlayer(1, 'position', inputStream))
-      .then(() => this.updatePlayer(2, 'type', inputStream))
-      .then(() => this.updatePlayer(2, 'symbol', inputStream))
-      .then(() => this.updatePlayer(2, 'position', inputStream));
+    return this.updatePlayer(1, 'type')
+      .then(() => this.updatePlayer(1, 'symbol'))
+      .then(() => this.updatePlayer(1, 'position'))
+      .then(() => this.updatePlayer(2, 'type'))
+      .then(() => this.updatePlayer(2, 'symbol'))
+      .then(() => this.updatePlayer(2, 'position'));
   },
 
   // TODO separate concerns in below function
   // TODO handle bad data entry
   // TODO implement catch
-  updatePlayer: function (player, prop, stream) {
+  updatePlayer: function (player, prop) {
     const boundModel = this.model;
+    const boundView = this.view;
     // return early if currentPlayer has already been assigned
     if (prop === 'position' && this.model.shareCurrentPlayer()) {
       return;
     }
-    this.view.sayMessage(this.view.messages.playerSetup[prop]);
+    boundView.sayMessage(boundView.messages.playerSetup[prop]);
     const playerData = new Promise(function (resolve, reject) {
-      stream.once('data', res => {
-        let convertedRes = res.toString('utf8').slice(0, 1);
-        if (prop === 'position') {
-          boundModel.setStartingPlayer(player, convertedRes);
-        } else {
-          if (prop === 'type' && convertedRes === '1') {
-            convertedRes = 'human';
-          } else if (prop === 'type' && convertedRes === '2') {
-            convertedRes = 'computer';
+      boundView.handleUserInput()
+        .then(selection => {
+          if (prop === 'position') {
+            boundModel.setStartingPlayer(player, selection);
+          } else {
+            if (prop === 'type' && selection === '1') {
+              selection = 'human';
+            } else if (prop === 'type' && selection === '2') {
+              selection = 'computer';
+            }
+            boundModel.setPlayerData(player, prop, selection);
           }
-          boundModel.setPlayerData(player, prop, convertedRes);
-        }
-        resolve(player[prop]);
+          resolve(player[prop]);
         // reject(console.log('Sorry, this data was invalid. Please make another selection.'));
-      });
+        });
     });
     return playerData;
   },
@@ -267,39 +267,39 @@ const controller = {
   runPlaySequence: function () {
     this.show();
     this.view.sayMessage(this.view.messages.instructions);
-    const inputStream = process.openStdin();
     // only nine moves are possible in a game of tic tac toe
-    return this.play(inputStream)
-      .then(() => this.play(inputStream))
-      .then(() => this.play(inputStream))
-      .then(() => this.play(inputStream))
-      .then(() => this.play(inputStream))
-      .then(() => this.play(inputStream))
-      .then(() => this.play(inputStream))
-      .then(() => this.play(inputStream))
-      .then(() => this.play(inputStream))
+    return this.play()
+      .then(() => this.play())
+      .then(() => this.play())
+      .then(() => this.play())
+      .then(() => this.play())
+      .then(() => this.play())
+      .then(() => this.play())
+      .then(() => this.play())
+      .then(() => this.play())
       .then(() => this.checkPatterns(this.model.sharePatterns()[3]))
       .catch((e) => console.log(e));
   },
 
-  play: function (inputStream) {
+  play: function () {
     const boundController = this;
     const boundModel = this.model;
     const boundView = this.view;
     const currentPlayer = this.model.shareCurrentPlayer();
     const play = new Promise(function (resolve, reject) {
       if (currentPlayer.type === 'human') {
-        inputStream.once('data', function (chosenSpace) {
-          if (boundController.move(chosenSpace, currentPlayer.data)) {
-            boundController.show();
-            boundController.checkForGameOver();
-            boundModel.toggleCurrentPlayer();
-          } else {
-            boundView.sayMessage(boundView.messages.invalidEntry);
-          }
-          resolve(currentPlayer);
-          reject(console.log('rejected in human'));
-        });
+        boundView.handleUserInput()
+          .then(space => {
+            if (boundController.move(space, currentPlayer.data)) {
+              boundController.show();
+              boundController.checkForGameOver();
+              boundModel.toggleCurrentPlayer();
+            } else {
+              boundView.sayMessage(boundView.messages.invalidEntry);
+            }
+            resolve(currentPlayer);
+          });
+        // reject(console.log('rejected in human'));
       } else if (currentPlayer.type === 'computer') {
         setTimeout(function () {
           const space = boundController.computerPickSpace(currentPlayer);
@@ -308,7 +308,7 @@ const controller = {
           boundController.checkForGameOver();
           boundModel.toggleCurrentPlayer();
           resolve(currentPlayer);
-          reject(console.log('rejected in computer'));
+          // reject(console.log('rejected in computer'));
         }, 500);
       }
     });
@@ -332,6 +332,16 @@ const view = {
       welcome: 'Welcome to Tic Tac Toe! First you\'ll need to create your players. We\'ll set up one player at a time.'
     };
     this.sayMessage(this.messages.welcome);
+  },
+
+  handleUserInput: function () {
+    const input = new Promise(function (resolve, reject) {
+      process.openStdin().once('data', function (response) {
+        const convertedResponse = response.toString('utf8').slice(0, 1);
+        resolve(convertedResponse);
+      });
+    });
+    return input;
   },
 
   // TODO "the existing code is so coupled to the console"
