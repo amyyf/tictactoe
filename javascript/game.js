@@ -130,7 +130,7 @@ const model = {
   },
 
   toggleCurrentPlayer: function () {
-    this.currentPlayer === 1 ? this.currentPlayer = 2 : this.currentPlayer = 1;
+    this.currentPlayer = this.currentPlayer === 1 ? 2 : 1;
   }
 };
 
@@ -144,7 +144,6 @@ const controller = {
   },
 
   show: function () {
-    console.log('showing');
     const boardData = model.shareBoardData();
     const playerSymbols = model.sharePlayerSymbols();
     return view.renderBoard(boardData, playerSymbols);
@@ -154,12 +153,10 @@ const controller = {
   // TODO separate concerns with move and check for win
   computerPickSpace: function (currentPlayer) {
     let space = 0;
-    console.log('picking a space');
     const patterns = model.sharePatterns();
     const board = model.shareBoardData();
     const boundController = this;
     space = boundController.checkPatterns(patterns[0]);
-    console.log(space);
     if (space === -1) {
       space = boundController.checkPatterns(patterns[1]);
       if (space === -1) {
@@ -167,7 +164,6 @@ const controller = {
         the first empty space IF there's no possible win on the next move */
         if (board[4] === 0) {
           space = 4;
-          console.log('picked 4');
         } else {
           space = board.indexOf(0);
         }
@@ -215,16 +211,15 @@ const controller = {
   },
 
   // executes after player gives valid input or computer fn has selected a space
-  move: function (pos, x) {
-    console.log('moving');
+  move: function (chosenSpace, playerData) {
     // checks that the correct player is moving
-    // if (x !== model.currTurn) {
-    //   return false;
-    // }
+    if (playerData !== model.currentPlayer) {
+      return false;
+    }
     // unary plus ('+') converts position to a number
-    if (+pos >= 0 && +pos <= 8 && !isNaN(+pos) && model.board[+pos] === 0) {
+    if (+chosenSpace >= 0 && +chosenSpace <= 8 && !isNaN(+chosenSpace) && model.board[+chosenSpace] === 0) {
       // TODO need update board function
-      model.board.splice(+pos, 1, x);
+      model.board.splice(+chosenSpace, 1, playerData);
       return true;
     }
     // TODO handle bad data here or in play fn
@@ -242,38 +237,34 @@ const controller = {
   },
 
   checkForGameOver: function () {
-    if (this.winGame() || this.checkIfBoardFilled()) {
+    if (this.checkForWin() || this.checkIfBoardFilled()) {
       this.exit();
     }
   },
 
   checkPatterns: function (patternsToCheck) {
-    console.log('checking patterns');
     const boardString = model.board.join('');
     for (let i = 0; i < patternsToCheck.length; i++) {
-      console.log('in for loop');
       const array = boardString.match(patternsToCheck[i][0]);
       if (array) {
-        if (patternsToCheck === model.patterns[2]) {
-          model.gameWon = true;
-          this.winGame();
-        } else {
-          console.log(patternsToCheck[i][1]);
-          return patternsToCheck[i][1];
-        }
+        return patternsToCheck[i][1];
       }
     }
     return -1;
   },
 
   // TODO gameWon status no longer needed? it's probably a good check, though
-  winGame: function () {
-    if (model.gameWon === false) {
-      return;
+  checkForWin: function () {
+    const patterns = model.sharePatterns();
+    const winFound = this.checkPatterns(patterns[2]);
+    if (winFound === -1 && model.gameWon === false) {
+      return false;
+    } else {
+      model.gameWon = true;
+      this.show();
+      view.sayMessage(view.messages.gameWon);
+      return true;
     }
-    this.show();
-    view.sayMessage(view.messages.gameOver);
-    return true;
   },
 
   exit: function () {
@@ -303,9 +294,8 @@ const controller = {
     const currentPlayer = model.shareCurrentPlayer();
     const play = new Promise(function (resolve, reject) {
       if (currentPlayer.type === 'human') {
-        console.log('human playing, ' + currentPlayer.type);
-        inputStream.once('data', function (res) {
-          if (boundController.move(res, currentPlayer.data)) {
+        inputStream.once('data', function (chosenSpace) {
+          if (boundController.move(chosenSpace, currentPlayer.data)) {
             boundController.show();
             boundController.checkForGameOver();
             model.toggleCurrentPlayer();
@@ -313,18 +303,17 @@ const controller = {
             view.sayMessage(view.messages.invalidEntry);
           }
           resolve(currentPlayer);
-          reject(console.log('whoops in human'));
+          reject(console.log('rejected in human'));
         });
       } else if (currentPlayer.type === 'computer') {
         setTimeout(function () {
-          console.log('computer playing, ' + currentPlayer);
           const space = boundController.computerPickSpace(currentPlayer);
           boundController.move(space, currentPlayer.data);
           boundController.show();
           boundController.checkForGameOver();
           model.toggleCurrentPlayer();
           resolve(currentPlayer);
-          reject(console.log('whoops in computer'));
+          reject(console.log('rejected in computer'));
         }, 500);
       }
     });
@@ -337,6 +326,7 @@ const view = {
   init: function () {
     this.messages = {
       gameOver: 'Game over',
+      gameWon: 'Game won',
       instructions: 'Enter [0-8]:',
       invalidEntry: 'That was not a valid move',
       playerSetup: {
@@ -381,6 +371,7 @@ module.exports = {
   createPlayers: controller.createPlayers,
   gameWon: model.gameWon,
   getMove: controller.getMove,
+  model: model,
   move: controller.move,
   play: controller.play,
   players: model.players,

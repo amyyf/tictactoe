@@ -30,15 +30,15 @@ describe('Players', function () {
 
 describe('During gameplay', function () {
   it('valid user input makes a move', function () {
+    game.model.currentPlayer = 1;
     const X = game.players[0];
-    expect(game.move(2, X)).toBe(true);
+    expect(game.move(2, X.data)).toBe(true);
   });
   // TODO test comp function
 });
 
 describe('To win', function () {
   it('board not full at game start', function () {
-    this.gameMove = game.gameMove;
     expect(game.checkIfBoardFilled()).toBeFalsy();
   });
   it('game has not been won at game start', function () {
