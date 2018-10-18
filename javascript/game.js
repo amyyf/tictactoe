@@ -114,9 +114,8 @@ const model = {
   },
 
   shareCurrentPlayer: function () {
-    const id = this.currentPlayer;
     // correct to zero-index
-    return this.players[id - 1];
+    return this.players[this.currentPlayer - 1];
   },
 
   sharePatterns: function () {
@@ -124,9 +123,7 @@ const model = {
   },
 
   sharePlayerSymbols: function () {
-    const player1Symbol = this.players[0].symbol;
-    const player2Symbol = this.players[1].symbol;
-    return [player1Symbol, player2Symbol];
+    return [this.players[0].symbol, this.players[1].symbol];
   },
 
   toggleCurrentPlayer: function () {
@@ -136,27 +133,24 @@ const model = {
 
 const controller = {
 
-  init: function () {
-    model.init();
-    view.init();
+  init: function (model, view) {
+    this.model = model;
+    this.view = view;
+    this.model.init();
+    this.view.init();
     this.createPlayers()
       .then(() => this.runPlaySequence());
   },
 
   show: function () {
-    const boardData = model.shareBoardData();
-    const playerSymbols = model.sharePlayerSymbols();
-    return view.renderBoard(boardData, playerSymbols);
+    return this.view.renderBoard(this.model.shareBoardData(), this.model.sharePlayerSymbols());
   },
 
-  // this fn controls computer gameplay, runs after player makes a move and gameplay should continue
-  // TODO separate concerns with move and check for win
   computerPickSpace: function (currentPlayer) {
-    let space = 0;
-    const patterns = model.sharePatterns();
-    const board = model.shareBoardData();
+    const patterns = this.model.sharePatterns();
+    const board = this.model.shareBoardData();
     const boundController = this;
-    space = boundController.checkPatterns(patterns[0]);
+    let space = boundController.checkPatterns(patterns[0]);
     if (space === -1) {
       space = boundController.checkPatterns(patterns[1]);
       if (space === -1) {
@@ -186,25 +180,27 @@ const controller = {
   // TODO handle bad data entry
   // TODO implement catch
   updatePlayer: function (player, prop, stream) {
+    const boundModel = this.model;
     // return early if currentPlayer has already been assigned
-    if (prop === 'position' && model.shareCurrentPlayer()) {
+    if (prop === 'position' && this.model.shareCurrentPlayer()) {
       return;
     }
-    view.sayMessage(view.messages.playerSetup[prop]);
+    this.view.sayMessage(this.view.messages.playerSetup[prop]);
     const playerData = new Promise(function (resolve, reject) {
       stream.once('data', res => {
         let convertedRes = res.toString('utf8').slice(0, 1);
         if (prop === 'position') {
-          model.setStartingPlayer(player, convertedRes);
+          boundModel.setStartingPlayer(player, convertedRes);
         } else {
           if (prop === 'type' && convertedRes === '1') {
             convertedRes = 'human';
           } else if (prop === 'type' && convertedRes === '2') {
             convertedRes = 'computer';
           }
-          model.setPlayerData(player, prop, convertedRes);
+          boundModel.setPlayerData(player, prop, convertedRes);
         }
         resolve(player[prop]);
+        // reject(console.log('Sorry, this data was invalid. Please make another selection.'));
       });
     });
     return playerData;
@@ -213,13 +209,13 @@ const controller = {
   // executes after player gives valid input or computer fn has selected a space
   move: function (chosenSpace, playerData) {
     // checks that the correct player is moving
-    if (playerData !== model.currentPlayer) {
+    if (playerData !== this.model.currentPlayer) {
       return false;
     }
     // unary plus ('+') converts position to a number
-    if (+chosenSpace >= 0 && +chosenSpace <= 8 && !isNaN(+chosenSpace) && model.board[+chosenSpace] === 0) {
+    if (+chosenSpace >= 0 && +chosenSpace <= 8 && !isNaN(+chosenSpace) && this.model.board[+chosenSpace] === 0) {
       // TODO need update board function
-      model.board.splice(+chosenSpace, 1, playerData);
+      this.model.board.splice(+chosenSpace, 1, playerData);
       return true;
     }
     // TODO handle bad data here or in play fn
@@ -227,10 +223,9 @@ const controller = {
   },
 
   checkIfBoardFilled: function () {
-    let x = model.board.join('').indexOf(0);
-    if (x === -1) {
+    if (this.model.board.join('').indexOf(0) === -1) {
       this.show();
-      view.sayMessage(view.messages.gameOver);
+      this.view.sayMessage(this.view.messages.gameOver);
       return true;
     }
     return false;
@@ -243,26 +238,24 @@ const controller = {
   },
 
   checkPatterns: function (patternsToCheck) {
-    const boardString = model.board.join('');
+    const boardString = this.model.board.join('');
     for (let i = 0; i < patternsToCheck.length; i++) {
-      const array = boardString.match(patternsToCheck[i][0]);
-      if (array) {
+      if (boardString.match(patternsToCheck[i][0])) {
         return patternsToCheck[i][1];
       }
     }
     return -1;
   },
 
-  // TODO gameWon status no longer needed? it's probably a good check, though
   checkForWin: function () {
-    const patterns = model.sharePatterns();
-    const winFound = this.checkPatterns(patterns[2]);
-    if (winFound === -1 && model.gameWon === false) {
+    const patterns = this.model.sharePatterns();
+    const checkWinningPatterns = this.checkPatterns(patterns[2]);
+    if (checkWinningPatterns === -1 && this.model.gameWon === false) {
       return false;
     } else {
-      model.gameWon = true;
+      this.model.gameWon = true;
       this.show();
-      view.sayMessage(view.messages.gameWon);
+      this.view.sayMessage(this.view.messages.gameWon);
       return true;
     }
   },
@@ -273,7 +266,7 @@ const controller = {
 
   runPlaySequence: function () {
     this.show();
-    view.sayMessage(view.messages.instructions);
+    this.view.sayMessage(this.view.messages.instructions);
     const inputStream = process.openStdin();
     // only nine moves are possible in a game of tic tac toe
     return this.play(inputStream)
@@ -285,22 +278,24 @@ const controller = {
       .then(() => this.play(inputStream))
       .then(() => this.play(inputStream))
       .then(() => this.play(inputStream))
-      .then(() => this.checkPatterns(model.sharePatterns()[3]))
+      .then(() => this.checkPatterns(this.model.sharePatterns()[3]))
       .catch((e) => console.log(e));
   },
 
   play: function (inputStream) {
     const boundController = this;
-    const currentPlayer = model.shareCurrentPlayer();
+    const boundModel = this.model;
+    const boundView = this.view;
+    const currentPlayer = this.model.shareCurrentPlayer();
     const play = new Promise(function (resolve, reject) {
       if (currentPlayer.type === 'human') {
         inputStream.once('data', function (chosenSpace) {
           if (boundController.move(chosenSpace, currentPlayer.data)) {
             boundController.show();
             boundController.checkForGameOver();
-            model.toggleCurrentPlayer();
+            boundModel.toggleCurrentPlayer();
           } else {
-            view.sayMessage(view.messages.invalidEntry);
+            boundView.sayMessage(boundView.messages.invalidEntry);
           }
           resolve(currentPlayer);
           reject(console.log('rejected in human'));
@@ -311,7 +306,7 @@ const controller = {
           boundController.move(space, currentPlayer.data);
           boundController.show();
           boundController.checkForGameOver();
-          model.toggleCurrentPlayer();
+          boundModel.toggleCurrentPlayer();
           resolve(currentPlayer);
           reject(console.log('rejected in computer'));
         }, 500);
@@ -361,23 +356,11 @@ const view = {
   }
 };
 
-controller.init();
+controller.init(model, view);
 
 // export for Jasmine testing
 module.exports = {
-  board: model.board,
-  checkIfBoardFilled: controller.checkIfBoardFilled,
-  computerPickSpace: controller.computerPickSpace,
-  createPlayers: controller.createPlayers,
-  gameWon: model.gameWon,
-  getMove: controller.getMove,
+  controller: controller,
   model: model,
-  move: controller.move,
-  play: controller.play,
-  players: model.players,
-  renderBoard: view.renderBoard,
-  setPlayerData: model.setPlayerData,
-  show: controller.show,
-  startingPlayer: model.currentPlayer,
-  updatePlayer: controller.updatePlayer
+  view: view
 };
