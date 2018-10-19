@@ -3,32 +3,8 @@ const model = {
   init: function () {
     this.patterns = [
       // 0 indicates an unchosen spot
-      // patterns to win as O (or block O), position to play
+      // index 0: wins as player 1, blocks as player 2
       [
-        [(/022....../), 0],
-        [(/2..2..0../), 6],
-        [(/......220/), 8],
-        [(/..0..2..2/), 2],
-        [(/0..2..2../), 0],
-        [(/......022/), 6],
-        [(/..2..2..0/), 8],
-        [(/220....../), 2],
-        [(/0...2...2/), 0],
-        [(/..2.2.0../), 6],
-        [(/2...2...0/), 8],
-        [(/..0.2.2../), 2],
-        [(/202....../), 1],
-        [(/2..0..2../), 3],
-        [(/......202/), 7],
-        [(/..2..0..2/), 5],
-        [(/.0..2..2./), 1],
-        [(/...022.../), 3],
-        [(/.2..2..0./), 7],
-        [(/...220.../), 5]
-      ],
-      // patterns to win as X (or block X), position to play
-      [
-        [(/0{2}10.010{2}/), 1],
         [(/011....../), 0],
         [(/1..1..0../), 6],
         [(/......110/), 8],
@@ -49,6 +25,7 @@ const model = {
         [(/...011.../), 3],
         [(/.1..1..0./), 7],
         [(/...110.../), 5],
+        [(/0{2}10.010{2}/), 1],
         [(/0101..0../), 0],
         [(/0..1..010/), 6],
         [(/..0..1010/), 8],
@@ -62,7 +39,43 @@ const model = {
         [(/..1..0{2}10/), 8],
         [(/10{2}..1..0/), 2]
       ],
-      // these are the possible winning strings for each player
+      // index 1: wins as player 2, blocks as player 1
+      [
+        [(/022....../), 0],
+        [(/2..2..0../), 6],
+        [(/......220/), 8],
+        [(/..0..2..2/), 2],
+        [(/0..2..2../), 0],
+        [(/......022/), 6],
+        [(/..2..2..0/), 8],
+        [(/220....../), 2],
+        [(/0...2...2/), 0],
+        [(/..2.2.0../), 6],
+        [(/2...2...0/), 8],
+        [(/..0.2.2../), 2],
+        [(/202....../), 1],
+        [(/2..0..2../), 3],
+        [(/......202/), 7],
+        [(/..2..0..2/), 5],
+        [(/.0..2..2./), 1],
+        [(/...022.../), 3],
+        [(/.2..2..0./), 7],
+        [(/...220.../), 5],
+        [(/0{2}20.020{2}/), 1],
+        [(/0202..0../), 0],
+        [(/0..2..020/), 6],
+        [(/..0..2020/), 8],
+        [(/020..2.. /), 2],
+        [(/0{2}22..0../), 0],
+        [(/2..0..020/), 6],
+        [(/..0.220{3}/), 8],
+        [(/20{2}..2..0/), 2],
+        [(/020{2}..2../), 0],
+        [(/0..2..0{2}2/), 6],
+        [(/..2..0{2}20/), 8],
+        [(/20{2}..2..0/), 2]
+      ],
+      // possible winning strings for each player
       [
         [(/222....../), '2'],
         [(/...222.../), '2'],
@@ -182,12 +195,20 @@ const controller = {
     const patterns = this.model.sharePatterns();
     const board = this.model.shareBoardData();
     const boundController = this;
-    let space = boundController.checkPatterns(patterns[0]);
+    let checkFirst, checkSecond;
+    if (currentPlayer === 1) {
+      checkFirst = 0;
+      checkSecond = 1;
+    } else if (currentPlayer === 2) {
+      checkFirst = 1;
+      checkSecond = 0;
+    }
+    let space = boundController.checkPatterns(patterns[checkFirst]);
     if (space === -1) {
-      space = boundController.checkPatterns(patterns[1]);
+      space = boundController.checkPatterns(patterns[checkSecond]);
       if (space === -1) {
-        /* the computer's default/fallback position is the center or, if the center is filled,
-        the first empty space IF there's no possible win on the next move */
+      /* the computer's default/fallback position is the center or, if the center is filled,
+      the first empty space IF there's no possible win on the next move */
         if (board[4] === 0) {
           space = 4;
         } else {
@@ -252,7 +273,7 @@ const controller = {
         // reject(console.log('rejected in human'));
       } else if (currentPlayer.type === 'computer') {
         setTimeout(function () {
-          const space = boundController.computerPickSpace(currentPlayer);
+          const space = boundController.computerPickSpace(currentPlayer.data);
           boundController.move(space, currentPlayer.data);
           boundController.show();
           boundController.checkForGameOver();
@@ -277,7 +298,6 @@ const controller = {
       .then(() => this.play())
       .then(() => this.play())
       .then(() => this.play())
-      .then(() => this.checkPatterns(this.model.sharePatterns()[3]))
       .catch((e) => console.log(e));
   },
 
