@@ -8,7 +8,11 @@ module.exports = {
   },
 
   checkForGameOver: function () {
-    if (this.checkForWin() || this.checkIfBoardFilled()) {
+    if (this.checkForWin()) {
+      this.view.sayMessage(this.view.messages.gameWon, this.model.currentPlayer);
+      this.exit();
+    } else if (this.checkIfBoardFilled()) {
+      this.view.sayMessage(this.view.messages.gameOver);
       this.exit();
     }
   },
@@ -20,14 +24,12 @@ module.exports = {
       return false;
     } else {
       this.model.gameWon = true;
-      this.view.sayMessage(this.view.messages.gameWon, this.model.currentPlayer);
       return true;
     }
   },
 
   checkIfBoardFilled: function () {
     if (this.model.board.join('').indexOf(0) === -1) {
-      this.view.sayMessage(this.view.messages.gameOver);
       return true;
     }
     return false;
@@ -89,10 +91,6 @@ module.exports = {
   // TODO correct for zero-indexed array based on directions
   // executes after player gives valid input or computer fn has selected a space
   move: function (chosenSpace, playerData) {
-    // checks that the correct player is moving
-    if (playerData !== this.model.currentPlayer) {
-      return false;
-    }
     // unary plus ('+') converts position to a number
     if (+chosenSpace >= 0 && +chosenSpace <= 8 && !isNaN(+chosenSpace) && this.model.board[+chosenSpace] === 0) {
       // TODO need update board function
