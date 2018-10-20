@@ -5,8 +5,6 @@ module.exports = {
     this.view = view;
     this.model.init();
     this.view.init();
-    this.createPlayers()
-      .then(() => this.runPlaySequence());
   },
 
   checkForGameOver: function () {
@@ -74,6 +72,7 @@ module.exports = {
   },
 
   createPlayers: function () {
+    this.view.sayMessage(this.view.messages.welcome);
     return this.updatePlayer(1, 'type')
       .then(() => this.updatePlayer(1, 'symbol'))
       .then(() => this.updatePlayer(1, 'position'))
@@ -168,7 +167,7 @@ module.exports = {
     const boundView = this.view;
     // return early if currentPlayer has already been assigned
     if (prop === 'position' && this.model.shareCurrentPlayer()) {
-      return;
+      return Promise.resolve(player[prop]);
     }
     boundView.sayMessage(boundView.messages.playerSetup[prop], player);
     const playerData = new Promise(function (resolve, reject) {

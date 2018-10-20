@@ -24,7 +24,6 @@ module.exports = {
      symbol | symbol | symbol
 
     `;
-    this.sayMessage(this.messages.welcome);
   },
 
   convertBoardString: function (boardData) {
@@ -40,7 +39,9 @@ module.exports = {
   },
 
   getPlayerSymbols: function (playerSymbols) {
+    console.log(`getting symbols, ${playerSymbols}`);
     [ this.player1Symbol, this.player2Symbol ] = playerSymbols;
+    return (this.player1Symbol, this.player2Symbol);
   },
 
   handleUserInput: function () {
