@@ -1,47 +1,49 @@
-/* globals expectAsync describe, it, expect */
+/* globals describe, it, expect */
 
-const game = require('../game');
+const controller = require('../controller');
+const model = require('../model');
+// const view = require('../view');
 
 describe('The game board', function () {
   it('exists and is the correct length', function () {
-    expect(game.model.board).toBeDefined();
-    expect(game.model.board.length).toBe(9);
+    expect(model.board).toBeDefined();
+    expect(model.board.length).toBe(9);
   });
   it('renders in the console', function () {
     const board = (/........./);
-    expect(game.controller.show()).toMatch(board);
+    expect(controller.show()).toMatch(board);
   });
 });
 
-describe('Players', function () {
-  it('receive new properties from user input', function () {
-    expectAsync(game.controller.updatePlayer()).toBeResolved();
+describe('Before user config, players', function () {
+  // it('receive new properties from user input', function () {
+  //   expectAsync(controller.updatePlayer()).toBeResolved();
+  // });
+  it('have no starting position', function () {
+    expect(model.currentPlayer).toBe(null);
   });
-  it('are given starting positions by the user', function () {
-    expect(game.model.currentPlayer).toBe(null);
+  it('have no symbols defined', function () {
+    expect(model.players[0].symbol && model.players[1].symbol).toBeUndefined();
   });
-  it('are given symbols by the user', function () {
-    expect(game.model.players[0].symbol && game.model.players[1].symbol).toBeUndefined();
+  it('have no human/computer type', function () {
+    expect(model.players[0].type && model.players[1].type).toBeUndefined();
   });
-  it('are assigned human/computer type by the user', function () {
-    expect(game.model.players[0].type && game.model.players[1].type).toBeUndefined();
+});
+
+describe('Before game begins,', function () {
+  it('board is empty', function () {
+    expect(controller.checkIfBoardFilled()).toBeFalsy();
+  });
+  it('game has not been won', function () {
+    expect(model.gameWon).toBeFalsy();
   });
 });
 
 describe('During gameplay', function () {
   it('valid user input makes a move', function () {
-    game.model.currentPlayer = 1;
-    const X = game.model.players[0];
-    expect(game.controller.move(2, X.data)).toBe(true);
+    model.currentPlayer = 1;
+    const X = model.players[0];
+    expect(controller.move(2, X.data)).toBe(true);
   });
   // TODO test comp function
-});
-
-describe('To win', function () {
-  it('board not full at game start', function () {
-    expect(game.controller.checkIfBoardFilled()).toBeFalsy();
-  });
-  it('game has not been won at game start', function () {
-    expect(game.model.gameWon).toBeFalsy();
-  });
 });
