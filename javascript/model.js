@@ -1,10 +1,10 @@
 module.exports = {
 
   init: function () {
-    this.patterns = [
+    this.patterns = {
       // 0 indicates an unchosen spot
       // index 0: wins as player 1, blocks as player 2
-      [
+      'player 1 matches': [
         [(/011....../), 0],
         [(/1..1..0../), 6],
         [(/......110/), 8],
@@ -40,7 +40,7 @@ module.exports = {
         [(/10{2}..1..0/), 2]
       ],
       // index 1: wins as player 2, blocks as player 1
-      [
+      'player 2 matches': [
         [(/022....../), 0],
         [(/2..2..0../), 6],
         [(/......220/), 8],
@@ -76,7 +76,7 @@ module.exports = {
         [(/20{2}..2..0/), 2]
       ],
       // possible winning strings for each player
-      [
+      'winning patterns': [
         [(/222....../), '2'],
         [(/...222.../), '2'],
         [(/......222/), '2'],
@@ -94,7 +94,7 @@ module.exports = {
         [(/1...1...1/), '1'],
         [(/..1.1.1../), '1']
       ]
-    ];
+    };
     this.board = [0, 0, 0, 0, 0, 0, 0, 0, 0];
     // TODO name formatted like Player 1?
     this.players = [
@@ -131,8 +131,8 @@ module.exports = {
     return this.players[this.currentPlayer - 1];
   },
 
-  sharePatterns: function () {
-    return this.patterns;
+  sharePatterns: function (patternKey) {
+    return this.patterns[patternKey];
   },
 
   sharePlayerSymbols: function () {

@@ -1,4 +1,4 @@
-/* globals beforeEach, describe, it, expect */
+/* globals beforeEach, describe, it, expect, spyOn */
 
 const controller = require('../controller');
 const model = require('../model');
@@ -28,12 +28,20 @@ describe('Before user config, players', function () {
   // });
 });
 
-describe('During gameplay', function () {
+describe('During gameplay, the patterns are checked', function () {
   beforeEach(function () {
     model.init();
     model.setStartingPlayer(1, 'y');
+    spyOn(controller, 'checkPatterns');
+    controller.computerPickSpace(1);
   });
-  // it('computer chooses a space', function () {
-  //   expect(controller.computerPickSpace(1)).toBeLessThanOrEqual(9);
-  // });
+  it('by the computer pick space function', function () {
+    expect(controller.checkPatterns).toHaveBeenCalled();
+    expect(controller.checkPatterns).toHaveBeenCalledWith('player 1 matches');
+  });
+  it('by the checkForWin function', function () {
+    controller.checkForWin();
+    expect(controller.checkPatterns).toHaveBeenCalled();
+    expect(controller.checkPatterns).toHaveBeenCalledWith('winning patterns');
+  });
 });

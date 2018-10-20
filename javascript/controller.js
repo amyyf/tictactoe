@@ -18,8 +18,7 @@ module.exports = {
   },
 
   checkForWin: function () {
-    const patterns = this.model.sharePatterns();
-    const checkWinningPatterns = this.checkPatterns(patterns[2]);
+    const checkWinningPatterns = this.checkPatterns('winning patterns');
     if (checkWinningPatterns === -1 && this.model.gameWon === false) {
       return false;
     } else {
@@ -36,37 +35,37 @@ module.exports = {
   },
 
   checkPatterns: function (patternsToCheck) {
-    const boardString = this.model.board.join('');
-    for (let i = 0; i < patternsToCheck.length; i++) {
-      if (boardString.match(patternsToCheck[i][0])) {
-        return patternsToCheck[i][1];
+    const patterns = this.model.sharePatterns(patternsToCheck);
+    const boardString = this.model.shareBoardData().join('');
+    for (let i = 0; i < patterns.length; i++) {
+      if (boardString.match(patterns[i][0])) {
+        return patterns[i][1];
       }
     }
     return -1;
   },
 
   computerPickSpace: function (currentPlayer) {
-    const patterns = this.model.sharePatterns();
-    const board = this.model.shareBoardData();
     const boundController = this;
+    // determine which patterns to check first
     let checkFirst, checkSecond;
     if (currentPlayer === 1) {
-      checkFirst = 0;
-      checkSecond = 1;
+      checkFirst = 'player 1 matches';
+      checkSecond = 'player 2 matches';
     } else if (currentPlayer === 2) {
-      checkFirst = 1;
-      checkSecond = 0;
+      checkFirst = 'player 2 matches';
+      checkSecond = 'player 1 matches';
     }
-    let space = boundController.checkPatterns(patterns[checkFirst]);
+    let space = boundController.checkPatterns(checkFirst);
     if (space === -1) {
-      space = boundController.checkPatterns(patterns[checkSecond]);
+      space = boundController.checkPatterns(checkSecond);
       if (space === -1) {
       /* the computer's default/fallback position is the center or, if the center is filled,
       the first empty space IF there's no possible win on the next move */
-        if (board[4] === 0) {
+        if (this.model.shareBoardData()[4] === 0) {
           space = 4;
         } else {
-          space = board.indexOf(0);
+          space = this.model.shareBoardData().indexOf(0);
         }
       }
     }
