@@ -5,7 +5,7 @@ module.exports = {
       gameOver: 'Game over',
       gameWon: 'Player num wins!',
       instructions: 'Instructions: \nEnter [1-9] to make your move. \nThe spaces in the board above are currently marked to show which key corresponds with which space. \nPress ENTER to play!',
-      invalidEntry: 'That was not a valid move',
+      invalidEntry: 'That was not a valid entry',
       player1: 'Player 1',
       player2: 'Player 2',
       playerSetup: {

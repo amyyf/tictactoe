@@ -87,12 +87,11 @@ module.exports = {
     process.exit();
   },
 
-  // TODO correct for zero-indexed array based on directions
   // executes after player gives valid input or computer fn has selected a space
   move: function (chosenSpace, playerData) {
     // unary plus ('+') converts position to a number
     if (+chosenSpace >= 0 && +chosenSpace <= 8 && !isNaN(+chosenSpace) && this.model.board[+chosenSpace] === 0) {
-      // TODO need update board function
+      // TODO need update board function in model
       this.model.board.splice(+chosenSpace, 1, playerData);
       return true;
     }
@@ -112,10 +111,13 @@ module.exports = {
         boundView.handleUserInput()
           .then(space => {
             if (boundController.move(space - 1, currentPlayer.data)) {
+              /* TODO duplicated code - maybe set human/computer outside promise,
+              pick space, then initiate move sequence */
               boundController.show();
               boundController.checkForGameOver();
               boundModel.toggleCurrentPlayer();
             } else {
+              console.log('invalid move');
               boundView.sayMessage(boundView.messages.invalidEntry);
             }
             resolve(currentPlayer);
@@ -125,6 +127,7 @@ module.exports = {
         setTimeout(function () {
           const space = boundController.computerPickSpace(currentPlayer.data);
           boundController.move(space, currentPlayer.data);
+          // TODO duplicated code with above
           boundController.show();
           boundController.checkForGameOver();
           boundModel.toggleCurrentPlayer();
@@ -134,6 +137,37 @@ module.exports = {
       }
     });
     return play;
+  },
+
+  processInput: function (inputType, player) {
+    return this.view.handleUserInput()
+      .then(response => {
+        console.log(response + '  ' + inputType);
+        if (inputType === 'position') {
+          if (response === 'y' || response === 'n') {
+            return response;
+          } else {
+            this.view.sayMessage(this.view.messages.invalidEntry);
+            return this.updatePlayer(player, inputType);
+          }
+        } else if (inputType === 'type') {
+          if (response === '1' || response === '2') {
+            return response;
+          } else {
+            this.view.sayMessage(this.view.messages.invalidEntry);
+            return this.updatePlayer(player, inputType);
+          }
+        } else if (inputType === 'symbol') {
+          const regexp = /\S/;
+          if (response.match(regexp)) {
+            return response;
+          } else {
+            this.view.sayMessage(this.view.messages.invalidEntry);
+            return this.updatePlayer(player, inputType);
+          }
+        }
+        return response;
+      });
   },
 
   // only nine moves are possible in a game of tic tac toe
@@ -160,6 +194,7 @@ module.exports = {
   // TODO handle bad data entry
   // TODO implement catch
   updatePlayer: function (player, prop) {
+    const boundController = this;
     const boundModel = this.model;
     const boundView = this.view;
     // return early if currentPlayer has already been assigned
@@ -168,7 +203,7 @@ module.exports = {
     }
     boundView.sayMessage(boundView.messages.playerSetup[prop], player);
     const playerData = new Promise(function (resolve, reject) {
-      boundView.handleUserInput()
+      boundController.processInput(prop, player)
         .then(selection => {
           if (prop === 'position') {
             boundModel.setStartingPlayer(player, selection);

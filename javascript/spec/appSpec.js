@@ -40,6 +40,7 @@ describe('During gameplay, the patterns are checked', function () {
     expect(controller.checkPatterns).toHaveBeenCalledWith('player 1 matches');
   });
   it('by the checkForWin function', function () {
+    model.gameWon = true;
     controller.checkForWin();
     expect(controller.checkPatterns).toHaveBeenCalled();
     expect(controller.checkPatterns).toHaveBeenCalledWith('winning patterns');
