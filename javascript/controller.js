@@ -89,7 +89,6 @@ module.exports = {
 
   // executes after player gives valid input or computer fn has selected a space
   move: function (chosenSpace, playerData) {
-    console.log(chosenSpace);
     // unary plus ('+') converts position to a number
     if (+chosenSpace >= 0 && +chosenSpace <= 8 && !isNaN(+chosenSpace) && this.model.board[+chosenSpace] === 0) {
       // TODO need update board function in model
@@ -100,26 +99,26 @@ module.exports = {
     return false;
   },
 
-  play: function () {
+  play: function (invalidEntry) {
     const boundController = this;
     const boundModel = this.model;
     const boundView = this.view;
     const currentPlayer = this.model.shareCurrentPlayer();
     const play = new Promise(function (resolve, reject) {
-      boundController.show();
-      boundView.sayMessage(boundView.messages.turn, currentPlayer.data);
+      boundController.show('turn', currentPlayer.data);
+      if (invalidEntry) {
+        boundView.sayMessage(boundView.messages.invalidEntry, currentPlayer.data);
+      }
+      // boundView.sayMessage(boundView.messages.turn, currentPlayer.data);
       if (currentPlayer.type === 'human') {
         return boundController.processInput('move', currentPlayer.data)
           .then(space => {
             if (boundController.move(space, currentPlayer.data)) {
               /* TODO duplicated code - maybe set human/computer outside promise,
               pick space, then initiate move sequence */
-              boundController.show();
+              boundController.show('turn', currentPlayer.data);
               boundController.checkForGameOver();
               boundModel.toggleCurrentPlayer();
-            } else {
-              boundView.sayMessage(boundView.messages.invalidEntry);
-              boundView.sayMessage(boundView.messages.turn, currentPlayer.data);
             }
             resolve(currentPlayer);
           });
@@ -128,7 +127,7 @@ module.exports = {
           const space = boundController.computerPickSpace(currentPlayer.data);
           boundController.move(space, currentPlayer.data);
           // TODO duplicated code with above
-          boundController.show();
+          boundController.show('turn', currentPlayer.data);
           boundController.checkForGameOver();
           boundModel.toggleCurrentPlayer();
           resolve(currentPlayer);
@@ -168,7 +167,7 @@ module.exports = {
             return response;
           } else {
             this.view.sayMessage(this.view.messages.invalidEntry);
-            return this.play();
+            return this.play('invalidEntry');
           }
         }
       });
@@ -189,13 +188,13 @@ module.exports = {
       .catch((e) => console.log(e));
   },
 
-  show: function () {
+  show: function (message, playerData) {
     const board = this.view.convertBoardString(this.model.shareBoardData());
     this.view.renderBoard(board);
+    this.view.sayMessage(this.view.messages[message], playerData);
   },
 
   // TODO separate concerns in below function
-  // TODO handle bad data entry
   // TODO implement catch
   updatePlayer: function (player, prop) {
     const boundController = this;
@@ -220,7 +219,6 @@ module.exports = {
             boundModel.setPlayerData(player, prop, selection);
           }
           resolve(player[prop]);
-          // reject(console.log('Sorry, this data was invalid. Please make another selection.'));
         });
     });
     return playerData;

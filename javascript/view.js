@@ -58,7 +58,7 @@ module.exports = {
   },
 
   renderBoard: function (boardString) {
-    // console.clear();
+    console.clear();
     let newBoard = this.board;
     boardString.forEach(symbol => {
       newBoard = newBoard.replace('symbol', symbol);
