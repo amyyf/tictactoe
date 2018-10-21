@@ -87,21 +87,20 @@ module.exports = {
     process.exit();
   },
 
-  // executes after player gives valid input or computer fn has selected a space
   move: function (chosenSpace, playerData) {
     // unary plus ('+') converts position to a number
     if (+chosenSpace >= 0 && +chosenSpace <= 8 && !isNaN(+chosenSpace) && this.model.board[+chosenSpace] === 0) {
-      // TODO need update board function in model
-      this.model.board.splice(+chosenSpace, 1, playerData);
+      this.model.updateBoard(+chosenSpace, playerData);
+      this.show('turn', playerData);
+      this.checkForGameOver();
+      this.model.toggleCurrentPlayer();
       return true;
     }
-    // TODO handle bad data here or in play fn
     return false;
   },
 
   play: function (invalidEntry) {
     const boundController = this;
-    const boundModel = this.model;
     const boundView = this.view;
     const currentPlayer = this.model.shareCurrentPlayer();
     const play = new Promise(function (resolve, reject) {
@@ -109,27 +108,17 @@ module.exports = {
       if (invalidEntry) {
         boundView.sayMessage(boundView.messages.invalidEntry, currentPlayer.data);
       }
-      // boundView.sayMessage(boundView.messages.turn, currentPlayer.data);
       if (currentPlayer.type === 'human') {
         return boundController.processInput('move', currentPlayer.data)
           .then(space => {
             if (boundController.move(space, currentPlayer.data)) {
-              /* TODO duplicated code - maybe set human/computer outside promise,
-              pick space, then initiate move sequence */
-              boundController.show('turn', currentPlayer.data);
-              boundController.checkForGameOver();
-              boundModel.toggleCurrentPlayer();
+              resolve(currentPlayer);
             }
-            resolve(currentPlayer);
           });
       } else if (currentPlayer.type === 'computer') {
         setTimeout(function () {
           const space = boundController.computerPickSpace(currentPlayer.data);
           boundController.move(space, currentPlayer.data);
-          // TODO duplicated code with above
-          boundController.show('turn', currentPlayer.data);
-          boundController.checkForGameOver();
-          boundModel.toggleCurrentPlayer();
           resolve(currentPlayer);
         }, 500);
       }

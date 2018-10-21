@@ -141,5 +141,9 @@ module.exports = {
 
   toggleCurrentPlayer: function () {
     this.currentPlayer = this.currentPlayer === 1 ? 2 : 1;
+  },
+
+  updateBoard: function (space, playerData) {
+    this.board.splice(space, 1, playerData);
   }
 };
