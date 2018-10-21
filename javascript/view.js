@@ -39,15 +39,18 @@ module.exports = {
   },
 
   getPlayerSymbols: function (playerSymbols) {
-    console.log(`getting symbols, ${playerSymbols}`);
     [ this.player1Symbol, this.player2Symbol ] = playerSymbols;
     return (this.player1Symbol, this.player2Symbol);
   },
 
-  handleUserInput: function () {
+  handleUserInput: function (inputType) {
     const input = new Promise(function (resolve, reject) {
       process.openStdin().once('data', function (response) {
-        const convertedResponse = response.toString('utf8').slice(0, 1);
+        let convertedResponse = response.toString('utf8').slice(0, 1);
+        if (inputType === 'move') {
+          // subtract 1 for zero-indexed array
+          convertedResponse = convertedResponse - 1;
+        }
         resolve(convertedResponse);
       });
     });

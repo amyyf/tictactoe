@@ -108,21 +108,20 @@ module.exports = {
       boundController.show();
       boundView.sayMessage(boundView.messages.turn, currentPlayer.data);
       if (currentPlayer.type === 'human') {
-        boundView.handleUserInput()
+        return boundController.processInput('move', currentPlayer.data)
           .then(space => {
-            if (boundController.move(space - 1, currentPlayer.data)) {
+            if (boundController.move(space, currentPlayer.data)) {
               /* TODO duplicated code - maybe set human/computer outside promise,
               pick space, then initiate move sequence */
               boundController.show();
               boundController.checkForGameOver();
               boundModel.toggleCurrentPlayer();
             } else {
-              console.log('invalid move');
               boundView.sayMessage(boundView.messages.invalidEntry);
+              boundView.sayMessage(boundView.messages.turn, currentPlayer.data);
             }
             resolve(currentPlayer);
           });
-        // reject(console.log('rejected in human'));
       } else if (currentPlayer.type === 'computer') {
         setTimeout(function () {
           const space = boundController.computerPickSpace(currentPlayer.data);
@@ -132,7 +131,6 @@ module.exports = {
           boundController.checkForGameOver();
           boundModel.toggleCurrentPlayer();
           resolve(currentPlayer);
-          // reject(console.log('rejected in computer'));
         }, 500);
       }
     });
@@ -140,9 +138,8 @@ module.exports = {
   },
 
   processInput: function (inputType, player) {
-    return this.view.handleUserInput()
+    return this.view.handleUserInput(inputType)
       .then(response => {
-        console.log(response + '  ' + inputType);
         if (inputType === 'position') {
           if (response === 'y' || response === 'n') {
             return response;
@@ -165,8 +162,14 @@ module.exports = {
             this.view.sayMessage(this.view.messages.invalidEntry);
             return this.updatePlayer(player, inputType);
           }
+        } else if (inputType === 'move') {
+          if (+response >= 0 && +response <= 8 && !isNaN(+response) && this.model.board[+response] === 0) {
+            return response;
+          } else {
+            this.view.sayMessage(this.view.messages.invalidEntry);
+            return this.play();
+          }
         }
-        return response;
       });
   },
 

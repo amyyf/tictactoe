@@ -30,19 +30,19 @@ describe('Before user config, players', function () {
 
 describe('During gameplay, the patterns are checked', function () {
   beforeEach(function () {
-    model.init();
+    controller.init(model, view);
     model.setStartingPlayer(1, 'y');
     spyOn(controller, 'checkPatterns');
-    controller.computerPickSpace(1);
   });
   it('by the computer pick space function', function () {
-    expect(controller.checkPatterns).toHaveBeenCalled();
+    controller.computerPickSpace(1);
+    expect(controller.checkPatterns).toHaveBeenCalledTimes(1);
     expect(controller.checkPatterns).toHaveBeenCalledWith('player 1 matches');
   });
   it('by the checkForWin function', function () {
     model.gameWon = true;
     controller.checkForWin();
-    expect(controller.checkPatterns).toHaveBeenCalled();
+    expect(controller.checkPatterns).toHaveBeenCalledTimes(1);
     expect(controller.checkPatterns).toHaveBeenCalledWith('winning patterns');
   });
 });
