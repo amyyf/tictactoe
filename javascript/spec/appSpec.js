@@ -1,4 +1,4 @@
-/* globals beforeEach, describe, it, expect, spyOn */
+/* globals afterEach, beforeEach, describe, expectAsync, it, expect, jasmine, spyOn */
 
 const controller = require('../controller');
 const model = require('../model');
@@ -21,28 +21,50 @@ describe('Before game begins,', function () {
   });
 });
 
-describe('Before user config, players', function () {
-  beforeEach(() => controller.init(model, view));
-  // it('receive new properties from user input', function () {
-  //   expectAsync(controller.updatePlayer()).toBeResolved();
-  // });
+describe('During user config,', function () {
+  beforeEach(() => {
+    spyOn(model, 'init');
+    spyOn(view, 'init');
+    controller.init(model, view);
+  });
+  it('all modules are initialized', function () {
+    expect(model.init).toHaveBeenCalled();
+    expect(view.init).toHaveBeenCalled();
+  });
+  it('the updatePlayer function runs and resolves', function () {
+    expectAsync(controller.updatePlayer(1, 'position')).toBeResolved();
+  });
+  it('the model receives player data updates', function () {
+    model.setPlayerData(1, 'type', 'computer');
+    expect(model.players[0].type).toBeDefined();
+    expect(model.players[0].type).toBe('computer');
+  });
 });
 
-describe('During gameplay, the patterns are checked', function () {
+describe('During gameplay,', function () {
   beforeEach(function () {
     controller.init(model, view);
     model.setStartingPlayer(1, 'y');
     spyOn(controller, 'checkPatterns');
   });
-  it('by the computer pick space function', function () {
+  it('the patterns are checked by the computer pick space function', function () {
     controller.computerPickSpace(1);
     expect(controller.checkPatterns).toHaveBeenCalledTimes(1);
     expect(controller.checkPatterns).toHaveBeenCalledWith('player 1 matches');
   });
-  it('by the checkForWin function', function () {
+  it('the patterns are checked by the checkForWin function', function () {
     model.gameWon = true;
     controller.checkForWin();
     expect(controller.checkPatterns).toHaveBeenCalledTimes(1);
     expect(controller.checkPatterns).toHaveBeenCalledWith('winning patterns');
+  });
+  it('human player moves must range between 0-8', function () {
+    expect(function () {
+      for (let x = 0; x <= 8; x++) {
+        controller.move(x, 1).toBeTruthy();
+      }
+    });
+    expect(controller.move(9, 1)).toBeFalsy();
+    expect(controller.move('a', 1)).toBeFalsy();
   });
 });

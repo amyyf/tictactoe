@@ -89,6 +89,7 @@ module.exports = {
 
   // executes after player gives valid input or computer fn has selected a space
   move: function (chosenSpace, playerData) {
+    console.log(chosenSpace);
     // unary plus ('+') converts position to a number
     if (+chosenSpace >= 0 && +chosenSpace <= 8 && !isNaN(+chosenSpace) && this.model.board[+chosenSpace] === 0) {
       // TODO need update board function in model

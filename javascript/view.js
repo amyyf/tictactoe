@@ -2,7 +2,7 @@ module.exports = {
 
   init: function () {
     this.messages = {
-      gameOver: 'Game over',
+      gameOver: 'Game over - no winner this time.',
       gameWon: 'Player num wins!',
       instructions: 'Instructions: \nEnter [1-9] to make your move. \nThe spaces in the board above are currently marked to show which key corresponds with which space. \nPress ENTER to play!',
       invalidEntry: 'That was not a valid entry',
@@ -58,7 +58,7 @@ module.exports = {
   },
 
   renderBoard: function (boardString) {
-    console.clear();
+    // console.clear();
     let newBoard = this.board;
     boardString.forEach(symbol => {
       newBoard = newBoard.replace('symbol', symbol);
