@@ -116,8 +116,8 @@ module.exports = {
     this.players[position][key] = value;
   },
 
-  setStartingPlayer: function (player, selection) {
-    if (this.currentPlayer === null && selection === 'y') {
+  setStartingPlayer: function (player) {
+    if (this.currentPlayer === null) {
       this.currentPlayer = player;
     }
   },

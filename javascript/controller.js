@@ -79,7 +79,6 @@ module.exports = {
       .then(() => this.updatePlayer(1, 'position'))
       .then(() => this.updatePlayer(2, 'type'))
       .then(() => this.updatePlayer(2, 'symbol'))
-      .then(() => this.updatePlayer(2, 'position'))
       .then(() => this.view.getPlayerSymbols(this.model.sharePlayerSymbols()));
   },
 
@@ -189,16 +188,16 @@ module.exports = {
     const boundController = this;
     const boundModel = this.model;
     const boundView = this.view;
-    // return early if currentPlayer has already been assigned
-    if (prop === 'position' && this.model.shareCurrentPlayer()) {
-      return Promise.resolve(player[prop]);
-    }
     boundView.sayMessage(boundView.messages.playerSetup[prop], player);
     const playerData = new Promise(function (resolve, reject) {
       boundController.processInput(prop, player)
         .then(selection => {
           if (prop === 'position') {
-            boundModel.setStartingPlayer(player, selection);
+            if (selection === 'y') {
+              boundModel.setStartingPlayer(1);
+            } else if (selection === 'n') {
+              boundModel.setStartingPlayer(2);
+            }
           } else {
             if (prop === 'type' && selection === '1') {
               selection = 'human';
