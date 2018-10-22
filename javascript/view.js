@@ -47,8 +47,8 @@ module.exports = {
     const input = new Promise(function (resolve, reject) {
       process.openStdin().once('data', function (response) {
         let convertedResponse = response.toString('utf8').slice(0, 1);
+        // subtract 1 for zero-indexed array
         if (inputType === 'move') {
-          // subtract 1 for zero-indexed array
           convertedResponse = convertedResponse - 1;
         }
         resolve(convertedResponse);

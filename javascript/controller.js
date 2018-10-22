@@ -74,6 +74,7 @@ module.exports = {
 
   createPlayers: function () {
     this.view.sayMessage(this.view.messages.welcome);
+    // 'position' selection only happens once since it's a binary
     return this.updatePlayer(1, 'type')
       .then(() => this.updatePlayer(1, 'symbol'))
       .then(() => this.updatePlayer(1, 'position'))
@@ -87,7 +88,7 @@ module.exports = {
   },
 
   move: function (chosenSpace, playerData) {
-    // unary plus ('+') converts position to a number
+    // unary plus ('+') ensures chosenSpace is a number
     this.model.updateBoard(+chosenSpace, playerData);
     this.checkForGameOver();
     this.model.toggleCurrentPlayer();
@@ -102,16 +103,18 @@ module.exports = {
       if (invalidEntry) {
         boundView.sayMessage(boundView.messages.invalidEntry, currentPlayer.data);
       }
+      // human player moves based on input
       if (currentPlayer.type === 'human') {
         resolve(
           boundController.processInput('move', currentPlayer.data)
             .then(space => boundController.move(space, currentPlayer.data))
         );
+      // computer player moves based on model patterns
       } else if (currentPlayer.type === 'computer') {
         setTimeout(function () {
           const space = boundController.computerPickSpace(currentPlayer.data);
           resolve(boundController.move(space, currentPlayer.data));
-        }, 500);
+        }, 750);
       }
     });
     return play;

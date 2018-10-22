@@ -3,9 +3,9 @@
 ##
 
 ### Fixed issues:
-- [x] Gracefully handle bad user input
-- [x] Increase difficulty level to 'hard'
-- [x] Improve user experience of gameplay with smoother transitions between moves, delay before computer moves, clearer user messages
+- [x] Gracefully handled bad user input
+- [x] Increased difficulty level to 'hard'
+- [x] Improved user experience of gameplay with smoother transitions between moves, delay before computer moves, clearer user messages
 
 ### New features added:
 - [x] User can choose type of player (human or computer)

@@ -96,7 +96,6 @@ module.exports = {
       ]
     };
     this.board = [0, 0, 0, 0, 0, 0, 0, 0, 0];
-    // TODO name formatted like Player 1?
     this.players = [
       {
         name: 'Player 1',
