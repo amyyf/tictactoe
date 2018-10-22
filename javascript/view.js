@@ -26,7 +26,7 @@ module.exports = {
     `;
   },
 
-  convertBoardString: function (boardData) {
+  convertBoardArrayToSymbols: function (boardData) {
     return boardData.map(space => {
       if (space === 0) {
         return ' ';
@@ -57,10 +57,10 @@ module.exports = {
     return input;
   },
 
-  renderBoard: function (boardString) {
+  renderBoard: function (boardSymbols) {
     console.clear();
     let newBoard = this.board;
-    boardString.forEach(symbol => {
+    boardSymbols.forEach(symbol => {
       newBoard = newBoard.replace('symbol', symbol);
     });
     console.log(newBoard);

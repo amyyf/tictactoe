@@ -9,10 +9,10 @@ module.exports = {
 
   checkForGameOver: function () {
     if (this.checkForWin()) {
-      this.view.sayMessage(this.view.messages.gameWon, this.model.currentPlayer);
+      this.show('gameWon', this.model.currentPlayer);
       this.exit();
     } else if (this.checkIfBoardFilled()) {
-      this.view.sayMessage(this.view.messages.gameOver);
+      this.show('gameOver');
       this.exit();
     }
   },
@@ -28,7 +28,7 @@ module.exports = {
   },
 
   checkIfBoardFilled: function () {
-    if (this.model.board.join('').indexOf(0) === -1) {
+    if (this.model.board.indexOf(0) === -1) {
       return true;
     }
     return false;
@@ -88,14 +88,9 @@ module.exports = {
 
   move: function (chosenSpace, playerData) {
     // unary plus ('+') converts position to a number
-    if (+chosenSpace >= 0 && +chosenSpace <= 8 && !isNaN(+chosenSpace) && this.model.board[+chosenSpace] === 0) {
-      this.model.updateBoard(+chosenSpace, playerData);
-      this.show('turn', playerData);
-      this.checkForGameOver();
-      this.model.toggleCurrentPlayer();
-      return true;
-    }
-    return false;
+    this.model.updateBoard(+chosenSpace, playerData);
+    this.checkForGameOver();
+    this.model.toggleCurrentPlayer();
   },
 
   play: function (invalidEntry) {
@@ -108,17 +103,14 @@ module.exports = {
         boundView.sayMessage(boundView.messages.invalidEntry, currentPlayer.data);
       }
       if (currentPlayer.type === 'human') {
-        return boundController.processInput('move', currentPlayer.data)
-          .then(space => {
-            if (boundController.move(space, currentPlayer.data)) {
-              resolve(currentPlayer);
-            }
-          });
+        resolve(
+          boundController.processInput('move', currentPlayer.data)
+            .then(space => boundController.move(space, currentPlayer.data))
+        );
       } else if (currentPlayer.type === 'computer') {
         setTimeout(function () {
           const space = boundController.computerPickSpace(currentPlayer.data);
-          boundController.move(space, currentPlayer.data);
-          resolve(currentPlayer);
+          resolve(boundController.move(space, currentPlayer.data));
         }, 500);
       }
     });
@@ -128,35 +120,19 @@ module.exports = {
   processInput: function (inputType, player) {
     return this.view.handleUserInput(inputType)
       .then(response => {
-        if (inputType === 'position') {
-          if (response === 'y' || response === 'n') {
-            return response;
-          } else {
-            this.view.sayMessage(this.view.messages.invalidEntry);
-            return this.updatePlayer(player, inputType);
+        if (
+          (inputType === 'position' && (response === 'y' || response === 'n')) ||
+          (inputType === 'type' && (response === '1' || response === '2')) ||
+          (inputType === 'symbol' && response.match(/\S/)) ||
+          (inputType === 'move' && (+response >= 0 && +response <= 8 && this.model.board[+response] === 0))
+        ) {
+          return response;
+        } else {
+          this.view.sayMessage(this.view.messages.invalidEntry);
+          if (inputType === 'move') {
+            return this.processInput(inputType, player);
           }
-        } else if (inputType === 'type') {
-          if (response === '1' || response === '2') {
-            return response;
-          } else {
-            this.view.sayMessage(this.view.messages.invalidEntry);
-            return this.updatePlayer(player, inputType);
-          }
-        } else if (inputType === 'symbol') {
-          const regexp = /\S/;
-          if (response.match(regexp)) {
-            return response;
-          } else {
-            this.view.sayMessage(this.view.messages.invalidEntry);
-            return this.updatePlayer(player, inputType);
-          }
-        } else if (inputType === 'move') {
-          if (+response >= 0 && +response <= 8 && !isNaN(+response) && this.model.board[+response] === 0) {
-            return response;
-          } else {
-            this.view.sayMessage(this.view.messages.invalidEntry);
-            return this.play('invalidEntry');
-          }
+          return this.updatePlayer(player, inputType);
         }
       });
   },
@@ -177,13 +153,11 @@ module.exports = {
   },
 
   show: function (message, playerData) {
-    const board = this.view.convertBoardString(this.model.shareBoardData());
+    const board = this.view.convertBoardArrayToSymbols(this.model.shareBoardData());
     this.view.renderBoard(board);
     this.view.sayMessage(this.view.messages[message], playerData);
   },
 
-  // TODO separate concerns in below function
-  // TODO implement catch
   updatePlayer: function (player, prop) {
     const boundController = this;
     const boundModel = this.model;

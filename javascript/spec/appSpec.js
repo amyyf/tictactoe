@@ -1,4 +1,4 @@
-/* globals afterEach, beforeEach, describe, expectAsync, it, expect, jasmine, spyOn */
+/* globals beforeEach, describe, expectAsync, it, expect, spyOn */
 
 const controller = require('../controller');
 const model = require('../model');
@@ -57,14 +57,5 @@ describe('During gameplay,', function () {
     controller.checkForWin();
     expect(controller.checkPatterns).toHaveBeenCalledTimes(1);
     expect(controller.checkPatterns).toHaveBeenCalledWith('winning patterns');
-  });
-  it('human player moves must range between 0-8', function () {
-    expect(function () {
-      for (let x = 0; x <= 8; x++) {
-        controller.move(x, 1).toBeTruthy();
-      }
-    });
-    expect(controller.move(9, 1)).toBeFalsy();
-    expect(controller.move('a', 1)).toBeFalsy();
   });
 });
